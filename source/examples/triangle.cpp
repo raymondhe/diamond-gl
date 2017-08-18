@@ -71,12 +71,17 @@ int main() {
 
     auto attribute = vao->create_attribute(0);
     attribute->attrib_format(3, GL_FLOAT, GL_FALSE);
-    attribute->binding(0u);
+    attribute->binding(binding);
 
 
-
+    // program uniform constant example
     auto uniform = program->get_uniform(0u);
     uniform->set<int>(0);
+
+
+    // SSBO binding example 
+    auto ssbo_binding = dgl::buffer_target::shader_storage.create_binding(0); // get SSBO binding by ID
+    ssbo_binding->bind(vbo);
 
 
     // drawing
