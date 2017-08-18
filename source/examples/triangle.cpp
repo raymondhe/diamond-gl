@@ -84,6 +84,21 @@ int main() {
     ssbo_binding->bind(vbo);
 
 
+    // create texture
+    auto texture = dgl::texture_target::t_2d.create();
+    texture->storage(1, GL_RGBA32F, glm::uvec2(1, 1)); // 2d texture
+    texture->parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    texture->parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture->parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    texture->parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+
+    // create GL texture binding
+    auto textureBinding = dgl::texture_binding_class::create(0);
+    textureBinding->bind_texture(texture);
+
+
+
     // drawing
     while (!glfwWindowShouldClose(window))
     {

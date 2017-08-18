@@ -26,13 +26,12 @@ namespace dgl {
             return (new shader_class(shaderType));
         }
 
-        /*
-        template<typename T>
-        T&& get(GLenum pname, T * params = T[1]) {
-            return *(this->get<T *>(pname, params));
-        }*/
+        template<class T>
+        T get_val(GLenum pname, T * params = nullptr) {
+            return *(this->get<T>(pname, params));
+        }
 
-        template<typename T>
+        template<class T>
         T * get(GLenum pname, T * params = nullptr) {
             if (!params) params = {0};
             if (typeid(T) == typeid(int)) glGetShaderiv(*this, pname, params);
@@ -40,7 +39,7 @@ namespace dgl {
         }
 
         std::string info_log(){
-            GLsizei lsize = *this->get<GLint>(GL_INFO_LOG_LENGTH);
+            GLsizei lsize = this->get_val<GLint>(GL_INFO_LOG_LENGTH);
             GLsizei size = lsize;
             GLchar * info = new GLchar[lsize];
             glGetShaderInfoLog(*this, lsize, &size, info);
@@ -173,7 +172,13 @@ namespace dgl {
         }
 
 
-        template<typename T>
+        template<class T>
+        T get_val(GLenum pname, T * params = nullptr) {
+            return *this->get<T>(pname, params);
+        }
+
+
+        template<class T>
         T * get(GLenum pname, T * params = nullptr) {
             if (!params) params = {0};
             if (typeid(T) == typeid(int)) glGetProgramiv(*this, pname, params);
@@ -181,7 +186,7 @@ namespace dgl {
         }
 
         std::string info_log(){
-            GLsizei lsize = *get<GLint>(GL_INFO_LOG_LENGTH);
+            GLsizei lsize = get_val<GLint>(GL_INFO_LOG_LENGTH);
             GLsizei size = lsize;
             GLchar * info = new GLchar[lsize];
             glGetProgramInfoLog(*this, lsize, &size, info);

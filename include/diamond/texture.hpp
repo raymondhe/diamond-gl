@@ -37,33 +37,52 @@ namespace dgl {
 
 
         template<class T>
-        void parameter(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameteriv(*this, pname, params);
-            if (typeid(T) == typeid(float)) glTextureParameterfv(*this, pname, params);
+        void parameter_val(GLenum pname, T param) const {
+            this->parameter<T>(pname, &param);
         }
+
+        template<class T>
+        void parameter_int_val(GLenum pname, T param) const {
+            this->parameter_int<T>(pname, &param);
+        }
+
+        template<class T>
+        T get_parameter_val(GLenum pname, T * params = nullptr) const {
+            return *(this->get_parameter(pname, params));
+        }
+
+        template<class T>
+        T get_parameter_int_val(GLenum pname, T * params = nullptr) const {
+            return *(this->get_parameter_int(pname, params));
+        }
+
 
 
         template<class T>
-        void parameter_int(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameterIiv(*this, pname, params);
-            if (typeid(T) == typeid(GLuint)) glTextureParameterIuiv(*this, pname, params);
+        void parameter(GLenum pname, T * params) const {
+            if (typeid(T) == typeid(int)) glTextureParameteriv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(float)) glTextureParameterfv(*this, pname, (float*)params);
         }
 
-
+        template<class T>
+        void parameter_int(GLenum pname, T * params) const {
+            if (typeid(T) == typeid(int)) glTextureParameterIiv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(GLuint)) glTextureParameterIuiv(*this, pname, (GLuint*)params);
+        }
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameteriv(*this, pname, params);
-            if (typeid(T) == typeid(float)) glGetTextureParameterfv(*this, pname, params);
+            if (typeid(T) == typeid(int)) glGetTextureParameteriv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(float)) glGetTextureParameterfv(*this, pname, (float*)params);
             return params;
         }
 
         template<class T>
         T * get_parameter_int(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameterIiv(*this, pname, params);
-            if (typeid(T) == typeid(GLuint)) glGetTextureParameterIuiv(*this, pname, params);
+            if (typeid(T) == typeid(int)) glGetTextureParameterIiv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(GLuint)) glGetTextureParameterIuiv(*this, pname, (GLuint*)params);
             return params;
         }
 
@@ -128,20 +147,40 @@ namespace dgl {
         }
 
 
+
+        template<class T>
+        void parameter_val(GLenum pname, T param) const {
+            this->parameter<T>(pname, &param);
+        }
+
+        template<class T>
+        void parameter_int_val(GLenum pname, T param) const {
+            this->parameter_int<T>(pname, &param);
+        }
+
+        template<class T>
+        T get_parameter_val(GLenum pname, T * params = nullptr) const {
+            return *(this->get_parameter(pname, params));
+        }
+
+        template<class T>
+        T get_parameter_int_val(GLenum pname, T * params = nullptr) const {
+            return *(this->get_parameter_int(pname, params));
+        }
+
+
+
         template<class T>
         void parameter(GLenum pname, T * params) const {
             if (typeid(T) == typeid(int)) glSamplerParameteriv(*this, pname, params);
             if (typeid(T) == typeid(float)) glSamplerParameterfv(*this, pname, params);
         }
 
-
         template<class T>
         void parameter_int(GLenum pname, T * params) const {
             if (typeid(T) == typeid(int)) glSamplerParameterIiv(*this, pname, params);
             if (typeid(T) == typeid(GLuint)) glSamplerParameterIuiv(*this, pname, params);
         }
-
-
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
@@ -165,6 +204,7 @@ namespace dgl {
     // texture binding
     class texture_binding_class: public base_class {
     protected:
+        friend _texture_context;
         texture_binding_class(GLuint binding = 0) {this->set_object(binding);}
 
     public:
@@ -210,6 +250,10 @@ namespace dgl {
         texture create(){
             return (new texture_class(this));
         }
+
+        //texture_binding create_binding(GLuint binding = 0) {
+        //    return (new texture_binding_class(binding));
+        //}
 
         // context named binding
         void bind(texture tex){
