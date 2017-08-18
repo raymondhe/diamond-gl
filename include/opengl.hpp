@@ -13,7 +13,6 @@ namespace dgl {
     protected:
         GLuint globj = 0;
         void set_object(GLuint obj) { globj = obj; }
-        operator GLuint&() { return globj; }
         operator GLuint*() { return &globj; }
     public:
         operator GLenum() const { return (GLenum)globj; }

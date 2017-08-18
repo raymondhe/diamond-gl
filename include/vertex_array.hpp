@@ -24,7 +24,7 @@ namespace dgl {
         }
 
     public:
-        void buffer(buffer buf, GLintptr offset, GLintptr stride){
+        void buffer(buffer buf, GLintptr offset = 0, GLintptr stride = 0){
             glVertexArrayVertexBuffer(*glvao, *this, *buf, offset, stride);
         }
     };

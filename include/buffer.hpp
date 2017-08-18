@@ -72,7 +72,7 @@ namespace dgl {
             glBindBufferBase(*gltarget, *this, *buf);
         }
 
-        void bind_range(buffer buf, GLintptr offset, GLsizei size){
+        void bind_range(buffer buf, GLintptr offset = 0, GLsizei size = 1){
             glBindBufferRange(*gltarget, *this, *buf, offset, size);
         }
     };
@@ -86,6 +86,14 @@ namespace dgl {
         buffer_binding create_binding(GLuint binding = 0){
             return (new buffer_binding_class(this, binding));
         }
+
+        // context named binding
+        void bind(buffer buf){
+            glBindBuffer(*this, *buf);
+        }
+
+
+        // TODO support of non-DSA (binded) operations
     };
 
 

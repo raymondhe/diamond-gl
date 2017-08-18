@@ -18,7 +18,7 @@ namespace dgl {
 
     class shader_class: public base_class {
     protected:
-        shader_class(GLenum shaderType) {(GLuint&)*this = glCreateShader(shaderType);}
+        shader_class(GLenum shaderType) {this->set_object(glCreateShader(shaderType));}
 
     public:
 
@@ -150,15 +150,13 @@ namespace dgl {
         template<uint64_t> set(std::vector<uint64_t> value){
             glProgramUniform1uiv64ARB(program, value.size(), value.data());
         }
-
-
     };
 
 
 
     class program_class: public base_class {
     protected:
-        program_class() {(GLuint&)*this = glCreateProgram();}
+        program_class() {this->set_object(glCreateProgram());}
 
         program_class(std::vector<std::string> shaders, GLenum shaderType){
             const GLchar ** parts = new const GLchar*[shaders.size()];

@@ -278,6 +278,7 @@ namespace dgl {
             return (new image_class(binding));
         }
 
+        // bind image texture
         void bind_texture(texture texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format) {
             glBindImageTexture(*this, *texture, level, layered, layer, access, format);
         }
@@ -289,8 +290,14 @@ namespace dgl {
     public:
         _texture_context(GLuint binding = 0) {this->set_object(binding);}        
 
+        // create texture
         texture create(){
             return (new texture_class(this));
+        }
+
+        // context named binding
+        void bind(texture tex){
+            glBindTexture(*this, *tex);
         }
     };
 
