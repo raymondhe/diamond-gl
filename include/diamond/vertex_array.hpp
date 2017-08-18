@@ -24,9 +24,7 @@ namespace dgl {
         }
 
     public:
-        void buffer(buffer buf, GLintptr offset = 0, GLintptr stride = 0){
-            glVertexArrayVertexBuffer(*glvao, *this, *buf, offset, stride);
-        }
+        void vertex_buffer(buffer buf, GLintptr offset = 0, GLintptr stride = 0);
     };
 
 
@@ -36,31 +34,15 @@ namespace dgl {
     protected:
         friend vertex_array_class;
         vertex_array glvao = nullptr;
-        vertex_array_attribute_class(vertex_array vao, GLuint binding = 0) {
-            glvao = vao;
-            this->set_object(binding);
-        }
+        vertex_array_attribute_class(vertex_array vao, GLuint binding = 0);
 
     public:
-        void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0){
-            glVertexArrayAttribFormat(*glvao, *this, size, type, normalized, relativeoffset);
-        }
-
-        void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0){
-            glVertexArrayAttribIFormat(*glvao, *this, size, type, relativeoffset);
-        }
-
-        void attrib_format_long(GLint size, GLenum type, GLuint relativeoffset = 0){
-            glVertexArrayAttribLFormat(*glvao, *this, size, type, relativeoffset);
-        }
-
-        void binding(vertex_array_binding binding) {
-            glVertexArrayAttribBinding(*glvao, *this, *binding);
-        }
-
-        void binding(GLuint binding) { // low level function
-            glVertexArrayAttribBinding(*glvao, *this, binding);
-        }
+        ~vertex_array_attribute_class();
+        void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0);
+        void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0);
+        void attrib_format_long(GLint size, GLenum type, GLuint relativeoffset = 0);
+        void binding(GLuint binding);
+        void binding(vertex_array_binding bnd) {this->binding((GLuint)*bnd);}
     };
 
 
@@ -94,5 +76,42 @@ namespace dgl {
         }
 
     };
+
+
+
+
+    vertex_array_attribute_class::vertex_array_attribute_class(vertex_array vao, GLuint binding) {
+        glvao = vao;
+        this->set_object(binding);
+        glEnableVertexArrayAttrib((GLuint)*glvao, *this);
+    }
+
+    vertex_array_attribute_class::~vertex_array_attribute_class() {
+        glDisableVertexArrayAttrib((GLuint)*glvao, *this);
+    }
+
+    void vertex_array_attribute_class::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
+        glVertexArrayAttribFormat((GLuint)*glvao, *this, size, type, normalized, relativeoffset);
+    }
+
+    void vertex_array_attribute_class::attrib_format_int(GLint size, GLenum type, GLuint relativeoffset) {
+        glVertexArrayAttribIFormat((GLuint)*glvao, *this, size, type, relativeoffset);
+    }
+
+    void vertex_array_attribute_class::attrib_format_long(GLint size, GLenum type, GLuint relativeoffset) {
+        glVertexArrayAttribLFormat((GLuint)*glvao, *this, size, type, relativeoffset);
+    }
+
+    void vertex_array_attribute_class::binding(GLuint binding) { // low level function
+        glVertexArrayAttribBinding((GLuint)*glvao, *this, binding);
+    }
+
+    void vertex_array_binding_class::vertex_buffer(buffer buf, GLintptr offset, GLintptr stride) {
+        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, stride);
+    }
+
+
+
+
     
 };

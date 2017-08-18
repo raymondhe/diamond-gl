@@ -14,7 +14,7 @@ namespace dgl {
     typedef uniform_class* uniform;
     typedef shader_class* shader;
     typedef program_class* program;
-    typedef program_pipeline* program_pipeline;
+    typedef program_pipeline_class* program_pipeline;
 
     class shader_class: public base_class {
     protected:
@@ -22,24 +22,25 @@ namespace dgl {
 
     public:
 
-        shader create(GLenum shaderType){
+        static shader create(GLenum shaderType){
             return (new shader_class(shaderType));
         }
 
+        /*
         template<typename T>
-        T get(GLenum pname, T * params = GLint[1]) {
+        T&& get(GLenum pname, T * params = T[1]) {
             return *(this->get<T *>(pname, params));
-        }
+        }*/
 
-        // parameter float vector by type cast
-        template<GLint *>
-        GLint * get(GLenum pname, GLint * params = GLint[8]) {
-            glGetShaderiv(*this, pname, params);
+        template<typename T>
+        T * get(GLenum pname, T * params = nullptr) {
+            if (!params) params = {0};
+            if (typeid(T) == typeid(int)) glGetShaderiv(*this, pname, params);
             return params;
         }
 
         std::string info_log(){
-            GLsizei lsize = this->get<GLint>(GL_INFO_LOG_LENGTH);
+            GLsizei lsize = *this->get<GLint>(GL_INFO_LOG_LENGTH);
             GLsizei size = lsize;
             GLchar * info = new GLchar[lsize];
             glGetShaderInfoLog(*this, lsize, &size, info);
@@ -83,72 +84,31 @@ namespace dgl {
         friend program_class;
         GLuint program = 0;
         uniform_class(GLuint prog, GLuint location = 0){
+            this->set_object(location);
             program = prog;
-            *this = location;
         }
 
     public:
 
         // base templates
+        template<class T>
+        void set(T value){
+            if  (typeid(T) == typeid(int)) glProgramUniform1i(program, *this, value);
+            if  (typeid(T) == typeid(GLuint)) glProgramUniform1ui(program, *this, value);
+            if  (typeid(T) == typeid(float)) glProgramUniform1f(program, *this, value);
+            if  (typeid(T) == typeid(double)) glProgramUniform1d(program, *this, value);
+            if  (typeid(T) == typeid(int64_t)) glProgramUniform1i64ARB(program, *this, value);
+            if  (typeid(T) == typeid(uint64_t)) glProgramUniform1ui64ARB(program, *this, value);
+        }
 
         template<class T>
-        set(T value){}
-
-        template<class T>
-        set(std::vector<T> values){}
-
-
-        // basic vector values
-
-        template<int> set(int value){
-            glProgramUniform1i(program, value);
-        }
-
-        template<GLuint> set(GLuint value){
-            glProgramUniform1ui(program, value);
-        }
-
-        template<float> set(float value){
-            glProgramUniform1f(program, value);
-        }
-
-        template<double> set(double value){
-            glProgramUniform1d(program, value);
-        }
-
-        template<int64_t> set(int64_t value){
-            glProgramUniform1i64ARB(program, value);
-        }
-
-        template<uint64_t> set(uint64_t value){
-            glProgramUniform1ui64ARB(program, value);
-        }
-
-
-        // basic type vectors
-
-        template<int> set(std::vector<int> value){
-            glProgramUniform1iv(program, value.size(), value.data());
-        }
-
-        template<GLuint> set(std::vector<GLuint> value){
-            glProgramUniform1uiv(program, value.size(), value.data());
-        }
-
-        template<float> set(std::vector<float> value){
-            glProgramUniform1fv(program, value.size(), value.data());
-        }
-
-        template<double> set(std::vector<double> value){
-            glProgramUniform1dv(program, value.size(), value.data());
-        }
-
-        template<int64_t> set(std::vector<int64_t> value){
-            glProgramUniform1iv64ARB(program, value.size(), value.data());
-        }
-
-        template<uint64_t> set(std::vector<uint64_t> value){
-            glProgramUniform1uiv64ARB(program, value.size(), value.data());
+        void set(std::vector<T> values){
+            if  (typeid(T) == typeid(int)) glProgramUniform1iv(program, *this, value.size(), value.data());
+            if  (typeid(T) == typeid(GLuint)) glProgramUniform1uiv(program, *this, value.size(), value.data());
+            if  (typeid(T) == typeid(float)) glProgramUniform1fv(program, *this, value.size(), value.data());
+            if  (typeid(T) == typeid(double)) glProgramUniform1dv(program, *this, value.size(), value.data());
+            if  (typeid(T) == typeid(int64_t)) glProgramUniform1iv64ARB(program, *this, value.size(), value.data());
+            if  (typeid(T) == typeid(uint64_t)) glProgramUniform1uiv64ARB(program, *this, value.size(), value.data());
         }
     };
 
@@ -175,28 +135,34 @@ namespace dgl {
 
         ~program_class() { glDeleteProgram(*this); }
 
-        program create(){
+        static program create(){
             return (new program_class());
         }
 
-        program create(std::string source, GLenum shaderType){
+        static program create(std::string source, GLenum shaderType){
             return (new program_class(source, shaderType));
         }
 
-        program create(std::vector<std::string> shaders, GLenum shaderType){
+        static program create(std::vector<std::string> shaders, GLenum shaderType){
             return (new program_class(shaders, shaderType));
         }
 
 
-        uniform get_uniform(std::string name){
-            return get_uniform(glGetUniformLocation(*this, name.c_str()));
-        }
+        
 
         uniform get_uniform(GLuint location){
             return (new uniform_class(*this, location));
         }
 
+        uniform get_uniform(std::string name) {
+            return get_uniform(glGetUniformLocation(*this, name.c_str()));
+        }
 
+
+
+        void use(){
+            glUseProgram(*this);
+        }
 
         void attach(shader shad){
             glAttachShader(*this, *shad);
@@ -208,19 +174,14 @@ namespace dgl {
 
 
         template<typename T>
-        T get(GLenum pname, T * params = GLint[1]) {
-            return *(this->get<T *>(pname, params));
-        }
-
-        // parameter float vector by type cast
-        template<GLint *>
-        GLint * get(GLenum pname, GLint * params = GLint[8]) {
-            glGetProgramiv(*this, pname, params);
+        T * get(GLenum pname, T * params = nullptr) {
+            if (!params) params = {0};
+            if (typeid(T) == typeid(int)) glGetProgramiv(*this, pname, params);
             return params;
         }
 
         std::string info_log(){
-            GLsizei lsize = get<GLint>(GL_INFO_LOG_LENGTH);
+            GLsizei lsize = *get<GLint>(GL_INFO_LOG_LENGTH);
             GLsizei size = lsize;
             GLchar * info = new GLchar[lsize];
             glGetProgramInfoLog(*this, lsize, &size, info);
@@ -237,7 +198,7 @@ namespace dgl {
     public:
         ~program_pipeline_class() {glDeleteProgramPipelines(1, *this);}
 
-        program_pipeline create(){
+        static program_pipeline create(){
             return (new program_pipeline_class());
         }
 

@@ -40,41 +40,18 @@ namespace dgl {
     };
 
 
-    // aliased structured buffer
-    template<class S>
-    class structured_buffer: buffer {
-        data(GLsizei size, const void *data, GLenum usage = GL_STATIC_DRAW){ 
-            buffer::data(sizeof(S) * size, data, usage); 
-        }
-
-        subdata(GLintptr offset, GLsizei size, const void *data){ 
-            buffer::subdata(offset, sizeof(S) * size, data); 
-        }
-
-        storage(GLsizei size, const void *data, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
-            buffer::storage(sizeof(S) * size, data, flags);
-        }
-    };
-
-
     class _buffer_context;
 
     // register buffer binding
     class buffer_binding_class: public base_class {
         friend _buffer_context;
         _buffer_context * gltarget = nullptr;
-        buffer_binding_class(_buffer_context * btarget, GLuint binding = 0) {this->set_object(binding); gltarget = btarget;}
+        buffer_binding_class(_buffer_context * btarget, GLuint binding = 0);
 
     public:
-        ~buffer_binding_class(){ glBindBufferBase(*gltarget, *this, 0); } // unbind
-
-        void bind(buffer buf){
-            glBindBufferBase(*gltarget, *this, *buf);
-        }
-
-        void bind_range(buffer buf, GLintptr offset = 0, GLsizei size = 1){
-            glBindBufferRange(*gltarget, *this, *buf, offset, size);
-        }
+        ~buffer_binding_class();
+        void bind(buffer buf);
+        void bind_range(buffer buf, GLintptr offset = 0, GLsizei size = 1);
     };
 
 
@@ -95,6 +72,24 @@ namespace dgl {
 
         // TODO support of non-DSA (binded) operations
     };
+
+
+
+
+
+
+    buffer_binding_class:: buffer_binding_class(_buffer_context * btarget, GLuint binding) { this->set_object(binding); gltarget = btarget; }
+    buffer_binding_class:: ~buffer_binding_class() { glBindBufferBase((GLenum)*gltarget, *this, 0); } // unbind
+
+    void buffer_binding_class::bind(buffer buf) {
+        glBindBufferBase((GLenum)*gltarget, *this, *buf);
+    }
+
+    void buffer_binding_class::bind_range(buffer buf, GLintptr offset, GLsizei size) {
+        glBindBufferRange((GLenum)*gltarget, *this, *buf, offset, size);
+    }
+
+
 
 
     // bindables

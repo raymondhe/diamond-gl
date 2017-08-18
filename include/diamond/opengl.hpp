@@ -15,7 +15,7 @@ namespace dgl {
         void set_object(GLuint obj) { globj = obj; }
         operator GLuint*() { return &globj; }
     public:
-        operator GLenum() const { return (GLenum)globj; }
+        //operator GLenum() const { return (GLenum)globj; }
         operator GLuint() const { return globj; }
     };
 };
