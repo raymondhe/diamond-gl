@@ -135,20 +135,20 @@ namespace dgl {
 
 
 
-        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels){
+        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const {
             glGetTextureSubImage(*this, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, buffersize, pixels);
         }
 
 
         // get subimage to vector
         template<class T>
-        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer){
+        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer) const {
             this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
         }
 
         // get subimage as vector
         template<class T>
-        std::vector<T>& get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize){
+        std::vector<T>& get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
             std::vector<T> buffer(buffersize);
             this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
             return buffer;
