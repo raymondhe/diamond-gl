@@ -44,23 +44,34 @@ namespace dgl {
         }
 
         
-        // vector based functions
+        // data from vector
         template<class T>
         void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
             this->data(data.size() * sizeof(T), data.data(), usage);
         }
 
+        // fill subdata by vector
         template<class T>
         void subdata(GLintptr offset, const std::vector<T>& data){
             this->subdata(offset, data.size() * sizeof(T), data.data());
         }
 
+        // get subdata by range
         template<class T>
         std::vector<T>& get_subdata(GLintptr offset, GLsizei size){
             std::vector<T> vctr(size);
             this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
             return vctr;
         }
+
+        // get subdata by full vector
+        template<class T>
+        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr){
+            this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
+            return vctr;
+        }
+
+
         
     };
 
