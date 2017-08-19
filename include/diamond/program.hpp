@@ -33,7 +33,7 @@ namespace dgl {
 
         template<class T>
         T * get(GLenum pname, T * params = nullptr) {
-            if (!params) params = {0};
+            if (!params) params = new T[1];
             if (typeid(T) == typeid(int)) glGetShaderiv(*this, pname, params);
             return params;
         }
@@ -180,7 +180,7 @@ namespace dgl {
 
         template<class T>
         T * get(GLenum pname, T * params = nullptr) {
-            if (!params) params = {0};
+            if (!params) params = new T[1];
             if (typeid(T) == typeid(int)) glGetProgramiv(*this, pname, params);
             return params;
         }

@@ -41,10 +41,16 @@ int main() {
     dgl::shader frag = dgl::shader_class::create(GL_FRAGMENT_SHADER);
     frag->source(fragmentShaderSource);
     frag->compile();
+    if (!frag->get_val<int>(GL_COMPILE_STATUS)) {
+        std::cerr << frag->info_log() << std::endl;
+    }
 
     dgl::shader vert = dgl::shader_class::create(GL_VERTEX_SHADER);
     vert->source(vertexShaderSource);
     vert->compile();
+    if (!vert->get_val<int>(GL_COMPILE_STATUS)) {
+        std::cerr << vert->info_log() << std::endl;
+    }
 
     dgl::program program = dgl::program_class::create();
     program->attach(vert);
