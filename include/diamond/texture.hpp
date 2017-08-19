@@ -117,7 +117,7 @@ namespace dgl {
 
 
         // simplified version of very hard function
-        void copy_mage_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) {
+        void copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {
             glCopyImageSubData(*this, (GLenum)this->target(), srcLevel, srcOffset.x, srcOffset.y, srcOffset.z, *destination, (GLenum)destination->target(), dstLevel, dstOffset.x, dstOffset.y, dstOffset.z, size.x, size.y, size.z);
         }
 
@@ -133,6 +133,26 @@ namespace dgl {
             glGenerateTextureMipmap(*this);
         }
 
+
+
+        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels){
+            glGetTextureSubImage(*this, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, buffersize, pixels);
+        }
+
+
+        // get subimage to vector
+        template<class T>
+        void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer){
+            this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
+        }
+
+        // get subimage as vector
+        template<class T>
+        std::vector<T>& get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize){
+            std::vector<T> buffer(buffersize);
+            this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
+            return buffer;
+        }
     };
 
 
@@ -155,12 +175,12 @@ namespace dgl {
 
 
         template<class T>
-        void parameter_val(GLenum pname, T param) const {
+        void parameter_val(GLenum pname, T param) {
             this->parameter<T>(pname, &param);
         }
 
         template<class T>
-        void parameter_int_val(GLenum pname, T param) const {
+        void parameter_int_val(GLenum pname, T param) {
             this->parameter_int<T>(pname, &param);
         }
 
@@ -177,13 +197,13 @@ namespace dgl {
 
 
         template<class T>
-        void parameter(GLenum pname, T * params) const {
+        void parameter(GLenum pname, T * params) {
             if (typeid(T) == typeid(int)) glSamplerParameteriv(*this, pname, params);
             if (typeid(T) == typeid(float)) glSamplerParameterfv(*this, pname, params);
         }
 
         template<class T>
-        void parameter_int(GLenum pname, T * params) const {
+        void parameter_int(GLenum pname, T * params) {
             if (typeid(T) == typeid(int)) glSamplerParameterIiv(*this, pname, params);
             if (typeid(T) == typeid(GLuint)) glSamplerParameterIuiv(*this, pname, params);
         }

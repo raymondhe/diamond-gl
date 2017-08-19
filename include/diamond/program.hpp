@@ -27,12 +27,12 @@ namespace dgl {
         }
 
         template<class T>
-        T get_val(GLenum pname, T * params = nullptr) {
+        T get_val(GLenum pname, T * params = nullptr) const {
             return *(this->get<T>(pname, params));
         }
 
         template<class T>
-        T * get(GLenum pname, T * params = nullptr) {
+        T * get(GLenum pname, T * params = nullptr) const {
             if (!params) params = new T[1];
             if (typeid(T) == typeid(int)) glGetShaderiv(*this, pname, params);
             return params;
@@ -173,13 +173,13 @@ namespace dgl {
 
 
         template<class T>
-        T get_val(GLenum pname, T * params = nullptr) {
+        T get_val(GLenum pname, T * params = nullptr) const {
             return *this->get<T>(pname, params);
         }
 
 
         template<class T>
-        T * get(GLenum pname, T * params = nullptr) {
+        T * get(GLenum pname, T * params = nullptr) const {
             if (!params) params = new T[1];
             if (typeid(T) == typeid(int)) glGetProgramiv(*this, pname, params);
             return params;

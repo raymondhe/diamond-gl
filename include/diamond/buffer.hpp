@@ -23,7 +23,7 @@ namespace dgl {
             return (new buffer_class());
         }
 
-        void get_subdata(GLintptr offset, GLsizei size, void *data){
+        void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(*this, offset, size, data);
         }
 
@@ -58,7 +58,7 @@ namespace dgl {
 
         // get subdata by range
         template<class T>
-        std::vector<T>& get_subdata(GLintptr offset, GLsizei size){
+        std::vector<T>& get_subdata(GLintptr offset, GLsizei size) const {
             std::vector<T> vctr(size);
             this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
             return vctr;
@@ -66,7 +66,7 @@ namespace dgl {
 
         // get subdata by full vector
         template<class T>
-        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr){
+        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
             this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
             return vctr;
         }
