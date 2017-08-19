@@ -102,13 +102,17 @@ int main() {
     // drawing
     while (!glfwWindowShouldClose(window))
     {
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClearDepth(1.f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // managment
+        dgl::managment::program::use(program);
+        dgl::managment::vertex_array::bind(vao);
 
-        program->use();
-        vao->bind();
-        dgl::state::draw_arrays(GL_TRIANGLES, 0, 3);
+        // states
+        dgl::state::clear::color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        dgl::state::clear::depth(1.f);
+
+        // commands
+        dgl::commands::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        dgl::commands::draw::arrays(GL_TRIANGLES, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

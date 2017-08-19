@@ -5,62 +5,57 @@
 namespace dgl {
     namespace state {
 
-        // context based
-        void blend_func(GLenum sfactor, GLenum dfactor){
-            glBlendFunc(sfactor, dfactor);
+        namespace blend {
+
+            // context based
+            void func(GLenum sfactor, GLenum dfactor) {
+                glBlendFunc(sfactor, dfactor);
+            }
+
+            void func(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) {
+                glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+            }
+
+            void equation(GLenum mode) {
+                glBlendEquation(mode);
+            }
+
+            void color(glm::vec4 color) {
+                glBlendColor(color.x, color.y, color.z, color.w);
+            }
+
+
+            // with draw buffers support
+            void func(GLuint draw_buffer, GLenum sfactor, GLenum dfactor) {
+                glBlendFunci(draw_buffer, sfactor, dfactor);
+            }
+
+            void func(GLuint draw_buffer, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha) {
+                glBlendFuncSeparatei(draw_buffer, srcRGB, dstRGB, srcAlpha, dstAlpha);
+            }
+
+            void equation(GLuint draw_buffer, GLenum mode) {
+                glBlendEquationi(draw_buffer, mode);
+            }
         }
 
-        void blend_func(GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha){
-            glBlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        // logic
+        namespace logic {
+            void op(GLenum opcode) {
+                glLogicOp(opcode);
+            }
         }
 
-        void blend_equation(GLenum mode){
-            glBlendEquation(mode);
-        }
+        // clear
+        namespace clear {
+            void color(glm::vec4 color) {
+                glClearColor(color.x, color.y, color.z, color.w);
+            }
 
-        void blend_color(glm::vec4 color){
-            glBlendColor(color.x, color.y, color.z, color.w);
-        }
-
-        void logic_op(GLenum opcode){
-            glLogicOp(opcode);
-        }
-
-
-
-        // with draw buffers support
-        void blend_func(GLuint draw_buffer, GLenum sfactor, GLenum dfactor){
-            glBlendFunci(draw_buffer, sfactor, dfactor);
-        }
-
-        void blend_func(GLuint draw_buffer, GLenum srcRGB, GLenum dstRGB, GLenum srcAlpha, GLenum dstAlpha){
-            glBlendFuncSeparatei(draw_buffer, srcRGB, dstRGB, srcAlpha, dstAlpha);
-        }
-
-        void blend_equation(GLuint draw_buffer, GLenum mode){
-            glBlendEquationi(draw_buffer, mode);
-        }
-
-
-
-        // draw
-
-        void draw_arrays(GLenum mode, GLint first, GLsizei count = 1, GLsizei primcount = 1){
-            glDrawArraysInstanced(mode, first, count, primcount);
-        }
-
-        void draw_elements(GLenum mode, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, const GLvoid * indices = nullptr, GLsizei primcount = 1){
-            glDrawElementsInstanced(mode, count, type, indices, primcount);
-        }
-
-        void draw_elements_base_vertex(GLenum mode, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, GLvoid *indices = nullptr, GLint basevertex = 0){
-            glDrawElementsBaseVertex(mode, count, type, indices, basevertex);
-        }
-
-        void draw_elements_range(GLenum mode, glm::ivec2 range, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, const GLvoid * indices = nullptr, GLsizei primcount = 1){
-            glDrawRangeElements(mode, range.x, range.y, count, type, indices);
-        }
-
-
+            void depth(float depth) {
+                glClearDepth(depth);
+            }
+        };
     };
+    
 }

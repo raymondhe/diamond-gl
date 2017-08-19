@@ -127,6 +127,12 @@ namespace dgl {
             glTextureBuffer(*this, internalformat, *buf);
         }
 
+
+        // generate mipmap
+        void generate_mipmap() {
+            glGenerateTextureMipmap(*this);
+        }
+
     };
 
 

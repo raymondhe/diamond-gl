@@ -71,9 +71,9 @@ namespace dgl {
             glVertexArrayElementBuffer(*this, *buf);
         }
 
-        void bind(){
-            glBindVertexArray(*this);
-        }
+        //void bind(){
+        //    glBindVertexArray(*this);
+        //}
 
     };
 

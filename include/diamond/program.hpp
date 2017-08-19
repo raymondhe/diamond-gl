@@ -159,9 +159,9 @@ namespace dgl {
 
 
 
-        void use(){
-            glUseProgram(*this);
-        }
+        //void use(){
+        //    glUseProgram(*this);
+        //}
 
         void attach(shader shad){
             glAttachShader(*this, *shad);
@@ -215,9 +215,9 @@ namespace dgl {
             glActiveShaderProgram(*this, *prog);
         }
 
-        void bind(){
-            glBindProgramPipeline(*this);
-        }
+        //void bind(){
+        //    glBindProgramPipeline(*this);
+        //}
     };
 
 
