@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opengl.hpp"
+#include <vector>
 
 namespace dgl {
 
@@ -22,6 +23,10 @@ namespace dgl {
             return (new buffer_class());
         }
 
+        void get_subdata(GLintptr offset, GLsizei size, void *data){
+            glGetNamedBufferSubData(*this, offset, size, data);
+        }
+
         void data(GLsizei size, const void *data, GLenum usage = GL_STATIC_DRAW){
             glNamedBufferData(*this, size, data, usage);
         }
@@ -37,6 +42,26 @@ namespace dgl {
         void copydata(buffer dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){
             glCopyNamedBufferSubData(*this, *dest, readOffset, writeOffset, size);
         }
+
+        
+        // vector based functions
+        template<class T>
+        void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
+            this->data(data.size() * sizeof(T), data.data(), usage);
+        }
+
+        template<class T>
+        void subdata(GLintptr offset, const std::vector<T>& data){
+            this->subdata(offset, data.size() * sizeof(T), data.data());
+        }
+
+        template<class T>
+        std::vector<T>& get_subdata(GLintptr offset, GLsizei size){
+            std::vector<T> vctr(size);
+            this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
+            return vctr;
+        }
+        
     };
 
 
