@@ -25,6 +25,12 @@ namespace dgl {
 
     public:
         void vertex_buffer(buffer buf, GLintptr offset = 0, GLintptr stride = 0);
+
+        template<class T>
+        void vertex_buffer(structured_buffer<T> buf, GLintptr offset = 0);
+
+        template<class T>
+        void vertex_buffer(buffer buf, GLintptr offset = 0);
     };
 
 
@@ -110,7 +116,15 @@ namespace dgl {
         glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, stride);
     }
 
+    template<class T>
+    void vertex_array_binding_class::vertex_buffer(structured_buffer<T> buf, GLintptr offset) {
+        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, sizeof(T));
+    }
 
+    template<class T>
+    void vertex_array_binding_class::vertex_buffer(buffer buf, GLintptr offset) {
+        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, sizeof(T));
+    }
 
 
     

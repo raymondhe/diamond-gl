@@ -60,11 +60,11 @@ int main() {
 
 
     // create vertices and buffer
-    dgl::structured_buffer<float> vbo = dgl::buffer_class::create<float>();
+    dgl::structured_buffer<glm::vec3> vbo = dgl::buffer_class::create<glm::vec3>();
     vbo->data({{
-        -0.5f, -0.5f, 0.0f, // left  
-         0.5f, -0.5f, 0.0f, // right 
-         0.0f,  0.5f, 0.0f  // top   
+        {-0.5f, -0.5f, 0.0f }, // left  
+        { 0.5f, -0.5f, 0.0f }, // right 
+        { 0.0f,  0.5f, 0.0f }  // top   
     }});
 
 
@@ -73,7 +73,7 @@ int main() {
     dgl::vertex_array vao = dgl::vertex_array_class::create();
 
     auto binding = vao->create_binding(0);
-    binding->vertex_buffer(vbo, 0, sizeof(float)*3);
+    binding->vertex_buffer(vbo, 0);
 
     auto attribute = vao->create_attribute(0);
     attribute->attrib_format(3, GL_FLOAT, GL_FALSE);
