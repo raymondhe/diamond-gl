@@ -60,8 +60,8 @@ int main() {
 
 
     // create vertices and buffer
-    dgl::buffer vbo = dgl::buffer_class::create();
-    vbo->data(std::vector<float>{{
+    dgl::structured_buffer<float> vbo = dgl::buffer_class::create<float>();
+    vbo->data({{
         -0.5f, -0.5f, 0.0f, // left  
          0.5f, -0.5f, 0.0f, // right 
          0.0f,  0.5f, 0.0f  // top   

@@ -11,6 +11,11 @@ namespace dgl {
     typedef buffer_class* buffer;
     typedef buffer_binding_class* buffer_binding;
 
+    template<class T>
+    class structured_buffer_class;
+
+    template<class T>
+    using structured_buffer = structured_buffer_class<T>*;
 
     class buffer_class: public base_class {
     protected:
@@ -18,6 +23,9 @@ namespace dgl {
 
     public:
         ~buffer_class() {glDeleteBuffers(1, *this);}
+
+        template<class T>
+        static structured_buffer<T> create();
 
         static buffer create(){
             return (new buffer_class());
@@ -70,10 +78,55 @@ namespace dgl {
             this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
             return vctr;
         }
-
-
-        
     };
+
+    template<class T>
+    class structured_buffer_class: public buffer_class {
+    public:
+        void get_subdata(GLintptr offset, GLsizei size, void *data) const {
+            buffer_class::get_subdata(offset, size * sizeof(T), data);
+        }
+
+        void data(GLsizei size, const void *data, GLenum usage = GL_STATIC_DRAW){
+            buffer_class::data(size * sizeof(T), data, usage);
+        }
+
+        void subdata(GLintptr offset, GLsizei size, const void *data){
+            buffer_class::subdata(offset, size * sizeof(T), data);
+        }
+
+        void storage(GLsizei size, const void *data, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
+            buffer_class::storage(size * sizeof(T), data, flags);
+        }
+
+        void copydata(buffer dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){
+            buffer_class::copydata(dest, readOffset, writeOffset, size * sizeof(T));
+        }
+
+
+        void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
+            return buffer_class::data<T>(data, usage);
+        }
+
+        void subdata(GLintptr offset, const std::vector<T>& data){
+            return buffer_class::subdata<T>(offset, data);
+        }
+
+        std::vector<T>& get_subdata(GLintptr offset, GLsizei size) const {
+            return buffer_class::get_subdata<T>(offset, size);
+        }
+
+        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
+            return buffer_class::get_subdata<T>(offset, vctr);
+        }
+    };
+
+
+    template<class T>
+    structured_buffer<T> buffer_class::create(){
+        return (new structured_buffer_class<T>());
+    }
+
 
 
     class _buffer_context;
