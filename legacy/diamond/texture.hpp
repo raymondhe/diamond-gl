@@ -2,32 +2,37 @@
 
 #include "opengl.hpp"
 #include "buffer.hpp"
-#include <memory>
 
 namespace dgl {
+
+    class texture_class;
+    class sampler_class;
+    class texture_binding_class;
+    class image_class;
+
+    typedef texture_class* texture;
+    typedef sampler_class* sampler;
+    typedef texture_binding_class* texture_binding;
+    typedef image_class* image;
+
 
     class _texture_context;
 
 
     // universal texture object
-    class texture: public base {
+    class texture_class: public base_class {
     protected:
         friend _texture_context;
-        //std::shared_ptr<_texture_context> gltarget;
-        _texture_context * gltarget;
-        texture(_texture_context &gltarget);
-        //texture(_texture_context &gltarget) {
-        //    this->gltarget = std::make_shared<_texture_context>(gltarget);
-        //    glCreateTextures((GLenum)gltarget, 1, thisref);
-        //};
+        _texture_context * gltarget = nullptr;
+        texture_class(_texture_context * gltarget);
 
     public:
-        ~texture(){
-            glDeleteTextures(1, thisref);
+        ~texture_class(){
+            glDeleteTextures(1, *this);
         }
 
-        _texture_context& target() const {
-            return *gltarget;
+        _texture_context * target() const {
+            return gltarget;
         }
 
 
@@ -55,29 +60,29 @@ namespace dgl {
 
         template<class T>
         void parameter(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameteriv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(float)) glTextureParameterfv(thisref, pname, (float*)params);
+            if (typeid(T) == typeid(int)) glTextureParameteriv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(float)) glTextureParameterfv(*this, pname, (float*)params);
         }
 
         template<class T>
         void parameter_int(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameterIiv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(GLuint)) glTextureParameterIuiv(thisref, pname, (GLuint*)params);
+            if (typeid(T) == typeid(int)) glTextureParameterIiv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(GLuint)) glTextureParameterIuiv(*this, pname, (GLuint*)params);
         }
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameteriv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(float)) glGetTextureParameterfv(thisref, pname, (float*)params);
+            if (typeid(T) == typeid(int)) glGetTextureParameteriv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(float)) glGetTextureParameterfv(*this, pname, (float*)params);
             return params;
         }
 
         template<class T>
         T * get_parameter_int(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameterIiv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(GLuint)) glGetTextureParameterIuiv(thisref, pname, (GLuint*)params);
+            if (typeid(T) == typeid(int)) glGetTextureParameterIiv(*this, pname, (int*)params);
+            if (typeid(T) == typeid(GLuint)) glGetTextureParameterIuiv(*this, pname, (GLuint*)params);
             return params;
         }
 
@@ -85,50 +90,53 @@ namespace dgl {
 
         // texture storage (accept GLM vector)
         void storage(GLsizei levels, GLenum internalformat, GLsizei size) {
-            glTextureStorage1D(thisref, levels, internalformat, size);
+            glTextureStorage1D(*this, levels, internalformat, size);
         }
 
         void storage(GLsizei levels, GLenum internalformat, glm::uvec2 size) {
-            glTextureStorage2D(thisref, levels, internalformat, size.x, size.y);
+            glTextureStorage2D(*this, levels, internalformat, size.x, size.y);
         }
 
         void storage(GLsizei levels, GLenum internalformat, glm::uvec3 size) {
-            glTextureStorage3D(thisref, levels, internalformat, size.x, size.y, size.z);
+            glTextureStorage3D(*this, levels, internalformat, size.x, size.y, size.z);
         }
 
 
         // subimage (accept GLM vector)
         void subimage(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels) {
-            glTextureSubImage3D(thisref, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, pixels);
+            glTextureSubImage3D(*this, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, pixels);
         }
 
         void subimage(GLint level, glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels) {
-            glTextureSubImage2D(thisref, level, offset.x, offset.y, size.x, size.y, format, type, pixels);
+            glTextureSubImage2D(*this, level, offset.x, offset.y, size.x, size.y, format, type, pixels);
         }
 
         void subimage(GLint level, GLint offset, GLsizei size, GLenum format, GLenum type, const GLvoid * pixels) {
-            glTextureSubImage1D(thisref, level, offset, size, format, type, pixels);
+            glTextureSubImage1D(*this, level, offset, size, format, type, pixels);
         }
 
 
         // simplified version of very hard function
-        void copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const;
+        void copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {
+            glCopyImageSubData(*this, (GLenum)this->target(), srcLevel, srcOffset.x, srcOffset.y, srcOffset.z, *destination, (GLenum)destination->target(), dstLevel, dstOffset.x, dstOffset.y, dstOffset.z, size.x, size.y, size.z);
+        }
+
 
         // texture of buffer 
-        void buffer(GLenum internalformat, buffer& buf){
-            glTextureBuffer(thisref, internalformat, buf);
+        void buffer(GLenum internalformat, buffer buf){
+            glTextureBuffer(*this, internalformat, *buf);
         }
 
 
         // generate mipmap
         void generate_mipmap() {
-            glGenerateTextureMipmap(thisref);
+            glGenerateTextureMipmap(*this);
         }
 
 
 
         void get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const {
-            glGetTextureSubImage(thisref, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, buffersize, pixels);
+            glGetTextureSubImage(*this, level, offset.x, offset.y, offset.z, size.x, size.y, size.z, format, type, buffersize, pixels);
         }
 
 
@@ -148,18 +156,20 @@ namespace dgl {
     };
 
 
-
-
-
     // universal sampler object
-    class sampler: public base {
-    public:
-        sampler(){
-            glCreateSamplers(1, thisref);
+    class sampler_class: public base_class {
+    protected:
+        sampler_class(){
+            glCreateSamplers(1, *this);
         }
 
-        ~sampler(){
-            glDeleteSamplers(1, thisref);
+    public:
+        static sampler create(){
+            return (new sampler_class());
+        }
+
+        ~sampler_class(){
+            glDeleteSamplers(1, *this);
         }
 
 
@@ -188,29 +198,29 @@ namespace dgl {
 
         template<class T>
         void parameter(GLenum pname, T * params) {
-            if (typeid(T) == typeid(int)) glSamplerParameteriv(thisref, pname, params);
-            if (typeid(T) == typeid(float)) glSamplerParameterfv(thisref, pname, params);
+            if (typeid(T) == typeid(int)) glSamplerParameteriv(*this, pname, params);
+            if (typeid(T) == typeid(float)) glSamplerParameterfv(*this, pname, params);
         }
 
         template<class T>
         void parameter_int(GLenum pname, T * params) {
-            if (typeid(T) == typeid(int)) glSamplerParameterIiv(thisref, pname, params);
-            if (typeid(T) == typeid(GLuint)) glSamplerParameterIuiv(thisref, pname, params);
+            if (typeid(T) == typeid(int)) glSamplerParameterIiv(*this, pname, params);
+            if (typeid(T) == typeid(GLuint)) glSamplerParameterIuiv(*this, pname, params);
         }
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetSamplerParameteriv(thisref, pname, params);
-            if (typeid(T) == typeid(float)) glGetSamplerParameterfv(thisref, pname, params);
+            if (typeid(T) == typeid(int)) glGetSamplerParameteriv(*this, pname, params);
+            if (typeid(T) == typeid(float)) glGetSamplerParameterfv(*this, pname, params);
             return params;
         }
 
         template<class T>
         T * get_parameter_int(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetSamplerParameterIiv(thisref, pname, params);
-            if (typeid(T) == typeid(GLuint)) glGetSamplerParameterIuiv(thisref, pname, params);
+            if (typeid(T) == typeid(int)) glGetSamplerParameterIiv(*this, pname, params);
+            if (typeid(T) == typeid(GLuint)) glGetSamplerParameterIuiv(*this, pname, params);
             return params;
         }
 
@@ -218,60 +228,70 @@ namespace dgl {
 
 
     // texture binding
-    class texture_binding: public base {
-    public:
+    class texture_binding_class: public base_class {
+    protected:
         friend _texture_context;
-        texture_binding(GLuint binding = 0) {this->set_object(binding);}
+        texture_binding_class(GLuint binding = 0) {this->set_object(binding);}
 
-        ~texture_binding(){}
-
-        void bind_sampler(sampler& sam) {
-            glBindSampler(thisref, sam);
+    public:
+        static texture_binding create(GLuint binding = 0){
+            return (new texture_binding_class(binding));
         }
 
-        void bind_texture(texture& tex) {
-            glBindTextureUnit(thisref, tex);
+        ~texture_binding_class(){}
+
+        void bind_sampler(sampler sam) {
+            glBindSampler(*this, *sam);
+        }
+
+        void bind_texture(texture tex) {
+            glBindTextureUnit(*this, *tex);
         }
     };
 
 
     // image binding
-    class image: public base {
+    class image_class: public base_class {
+    protected:
+        image_class(GLuint binding = 0) {this->set_object(binding);}
+
     public:
-        image(GLuint binding = 0) {this->set_object(binding);}
+        static image create(GLuint binding = 0){
+            return (new image_class(binding));
+        }
 
         // bind image texture
-        void bind_texture(texture& texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format) {
-            glBindImageTexture(thisref, texture, level, layered, layer, access, format);
+        void bind_texture(texture texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format) {
+            glBindImageTexture(*this, *texture, level, layered, layer, access, format);
         }
     };
 
 
     // contexted texture binding
-    class _texture_context: public base {
+    class _texture_context: public base_class {
     public:
         _texture_context(GLuint binding = 0) {this->set_object(binding);}        
 
         // create texture
-        texture&& create(){
-            return texture(thisref);
+        texture create(){
+            return (new texture_class(this));
         }
+
+        //texture_binding create_binding(GLuint binding = 0) {
+        //    return (new texture_binding_class(binding));
+        //}
 
         // context named binding
-        void bind(texture& tex){
-            glBindTexture(thisref, tex);
+        void bind(texture tex){
+            glBindTexture(*this, *tex);
         }
     };
 
-    texture::texture(_texture_context &gltarget) {
-        this->gltarget = &gltarget;//std::make_shared<_texture_context>(gltarget);
-        glCreateTextures((GLenum)gltarget, 1, thisref);
-    };
 
-    void texture::copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {
-        glCopyImageSubData(thisref, (GLenum)thisref.target(), srcLevel, srcOffset.x, srcOffset.y, srcOffset.z, destination, (GLenum)destination.target(), dstLevel, dstOffset.x, dstOffset.y, dstOffset.z, size.x, size.y, size.z);
+
+    texture_class::texture_class(_texture_context * gltarget) {
+        glCreateTextures((GLenum)*gltarget, 1, *this);
     }
-
 
 
 

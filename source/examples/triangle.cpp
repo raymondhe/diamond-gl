@@ -39,29 +39,31 @@ int main() {
 
 
     // create shaders
-    dgl::shader frag = dgl::shader_class::create(GL_FRAGMENT_SHADER);
-    frag->source(fragmentShaderSource);
-    frag->compile();
-    if (!frag->get_val<int>(GL_COMPILE_STATUS)) {
-        std::cerr << frag->info_log() << std::endl;
+    dgl::shader frag(GL_FRAGMENT_SHADER);
+    frag.source(fragmentShaderSource);
+    frag.compile();
+    if (!frag.get_val<int>(GL_COMPILE_STATUS)) {
+        std::cerr << frag.info_log() << std::endl;
     }
 
-    dgl::shader vert = dgl::shader_class::create(GL_VERTEX_SHADER);
-    vert->source(vertexShaderSource);
-    vert->compile();
-    if (!vert->get_val<int>(GL_COMPILE_STATUS)) {
-        std::cerr << vert->info_log() << std::endl;
+    dgl::shader vert(GL_VERTEX_SHADER);
+    vert.source(vertexShaderSource);
+    vert.compile();
+    if (!vert.get_val<int>(GL_COMPILE_STATUS)) {
+        std::cerr << vert.info_log() << std::endl;
     }
 
-    dgl::program program = dgl::program_class::create();
-    program->attach(vert);
-    program->attach(frag);
-    program->link();
-
+    dgl::program program;
+    program.attach(vert);
+    program.attach(frag);
+    program.link();
+    if (!program.get_val<int>(GL_LINK_STATUS)) {
+        std::cerr << program.info_log() << std::endl;
+    }
 
     // create vertices and buffer
-    dgl::structured_buffer<glm::vec3> vbo = dgl::buffer_class::create<glm::vec3>();
-    vbo->data({{
+    dgl::structured_buffer<glm::vec3> vbo;
+    vbo.data(std::vector<glm::vec3>{{
         {-0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
@@ -70,40 +72,39 @@ int main() {
 
 
     // create VAO
-    dgl::vertex_array vao = dgl::vertex_array_class::create();
+    dgl::vertex_array vao;
 
-    auto binding = vao->create_binding(0);
-    binding->vertex_buffer(vbo, 0);
+    auto binding = vao.create_binding(0);
+    binding.vertex_buffer(vbo, 0);
 
-    auto attribute = vao->create_attribute(0);
-    attribute->attrib_format(3, GL_FLOAT, GL_FALSE);
-    attribute->binding(binding);
+    auto attribute = vao.create_attribute(0);
+    attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
+    attribute.binding(binding);
 
-
+    /*
     // program uniform constant example
-    auto uniform = program->get_uniform(0u);
-    uniform->set<int>(0);
+    auto uniform = program.get_uniform(0u);
+    uniform.set<int>(0);
 
 
     // SSBO binding example 
     auto ssbo_binding = dgl::buffer_target::shader_storage.create_binding(0); // get SSBO binding by ID
-    ssbo_binding->bind(vbo);
+    ssbo_binding.bind(vbo);
 
 
     // create texture
     auto texture = dgl::texture_target::t_2d.create();
-    texture->storage(1, GL_RGBA32F, glm::uvec2(1, 1)); // 2d texture
-    texture->parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    texture->parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    texture->parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    texture->parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    texture.storage(1, GL_RGBA32F, glm::uvec2(1, 1)); // 2d texture
+    texture.parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    texture.parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    texture.parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    texture.parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 
     // create GL texture binding
-    auto textureBinding = dgl::texture_binding_class::create(0);
-    textureBinding->bind_texture(texture);
-
-
+    auto textureBinding = dgl::texture_binding(0);
+    textureBinding.bind_texture(texture);
+    */
 
     // drawing
     while (!glfwWindowShouldClose(window))

@@ -8,20 +8,20 @@ namespace dgl {
     namespace managment {
 
         namespace program {
-            void use(dgl::program& prog){
-                glUseProgram((GLuint)prog);
+            void use(dgl::program prog){
+                glUseProgram(*prog);
             }
 
             namespace pipeline {
-                void bind(dgl::program_pipeline& ppl){
-                    glBindProgramPipeline((GLuint)ppl);
+                void bind(dgl::program_pipeline ppl){
+                    glBindProgramPipeline(*ppl);
                 }
             }
         }
 
         namespace vertex_array {
-            void bind(dgl::vertex_array& vao){
-                glBindVertexArray((GLuint)vao);
+            void bind(dgl::vertex_array vao){
+                glBindVertexArray(*vao);
             }
         }
     };

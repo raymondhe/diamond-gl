@@ -1,131 +1,119 @@
 #pragma once
 
 #include "buffer.hpp"
+#include <memory>
 
 namespace dgl {
 
-    class vertex_array_class;
-    class vertex_array_binding_class;
-    class vertex_array_attribute_class;
+    class vertex_array;
 
-    typedef vertex_array_class* vertex_array;
-    typedef vertex_array_binding_class* vertex_array_binding;
-    typedef vertex_array_attribute_class* vertex_array_attribute;
-
-
-
-    class vertex_array_binding_class: public base_class {
-    protected:
-        friend vertex_array_class;
-        vertex_array glvao = nullptr;
-        vertex_array_binding_class(vertex_array vao, GLuint binding = 0) {
-            glvao = vao;
-            this->set_object(binding);
-        }
+    class vertex_array_binding: public base {
+        friend vertex_array;
+        //std::shared_ptr<vertex_array> glvao;
+        vertex_array * glvao;
 
     public:
-        void vertex_buffer(buffer buf, GLintptr offset = 0, GLintptr stride = 0);
+        vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
+            //glvao = std::make_shared<vertex_array>(vao);
+            glvao = &vao;
+            this->set_object(binding);
+        }
+    
+        void vertex_buffer(buffer& buf, GLintptr offset = 0, GLintptr stride = 0);
 
         template<class T>
-        void vertex_buffer(structured_buffer<T> buf, GLintptr offset = 0);
+        void vertex_buffer(structured_buffer<T>& buf, GLintptr offset = 0);
 
         template<class T>
-        void vertex_buffer(buffer buf, GLintptr offset = 0);
+        void vertex_buffer(buffer& buf, GLintptr offset = 0);
     };
 
 
 
 
-    class vertex_array_attribute_class: public base_class {
+    class vertex_array_attribute: public base {
     protected:
-        friend vertex_array_class;
-        vertex_array glvao = nullptr;
-        vertex_array_attribute_class(vertex_array vao, GLuint binding = 0);
+        friend vertex_array;
+        //std::shared_ptr<vertex_array> glvao;
+        vertex_array * glvao;
 
     public:
-        ~vertex_array_attribute_class();
+        vertex_array_attribute(vertex_array& vao, GLuint binding = 0);
+        //vertex_array_attribute(vertex_array& vao, GLuint binding = 0) {
+        //    glvao = std::make_shared<vertex_array>(vao);
+        //    this->set_object(binding);
+        //    glEnableVertexArrayAttrib(*glvao, thisref);
+        //}
+        ~vertex_array_attribute();
         void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0);
         void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0);
         void attrib_format_long(GLint size, GLenum type, GLuint relativeoffset = 0);
         void binding(GLuint binding);
-        void binding(vertex_array_binding bnd) {this->binding((GLuint)*bnd);}
+        void binding(vertex_array_binding& bnd) {this->binding((GLuint)bnd);}
     };
 
 
 
 
-    class vertex_array_class: public base_class {
-    protected:
-        vertex_array_class() {glCreateVertexArrays(1, *this);}
-
+    class vertex_array: public base {
     public:
-        static vertex_array create(){
-            return (new vertex_array_class());
+        vertex_array() {glCreateVertexArrays(1, thisref);}
+        ~vertex_array() {glDeleteVertexArrays(1, thisref);}
+
+        vertex_array_binding&& create_binding(GLuint binding = 0){
+            return vertex_array_binding(thisref, binding);
         }
 
-        ~vertex_array_class() {glDeleteVertexArrays(1, *this);}
-
-        vertex_array_binding create_binding(GLuint binding = 0){
-            return (new vertex_array_binding_class(this, binding));
+        vertex_array_attribute&& create_attribute(GLuint attribute = 0){
+            return vertex_array_attribute(thisref, attribute);
         }
 
-        vertex_array_attribute create_attribute(GLuint attribute = 0){
-            return (new vertex_array_attribute_class(this, attribute));
+        void element_buffer(buffer& buf){
+            glVertexArrayElementBuffer(thisref, buf);
         }
-
-        void element_buffer(buffer buf){
-            glVertexArrayElementBuffer(*this, *buf);
-        }
-
-        //void bind(){
-        //    glBindVertexArray(*this);
-        //}
-
     };
 
 
+    vertex_array_attribute::~vertex_array_attribute() {
+        glDisableVertexArrayAttrib(*glvao, thisref);
+    }
 
+    void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
+        glVertexArrayAttribFormat(*glvao, thisref, size, type, normalized, relativeoffset);
+    }
 
-    vertex_array_attribute_class::vertex_array_attribute_class(vertex_array vao, GLuint binding) {
-        glvao = vao;
+    void vertex_array_attribute::attrib_format_int(GLint size, GLenum type, GLuint relativeoffset) {
+        glVertexArrayAttribIFormat(*glvao, thisref, size, type, relativeoffset);
+    }
+
+    void vertex_array_attribute::attrib_format_long(GLint size, GLenum type, GLuint relativeoffset) {
+        glVertexArrayAttribLFormat(*glvao, thisref, size, type, relativeoffset);
+    }
+
+    void vertex_array_attribute::binding(GLuint binding) { // low level function
+        glVertexArrayAttribBinding(*glvao, thisref, binding);
+    }
+
+    void vertex_array_binding::vertex_buffer(buffer& buf, GLintptr offset, GLintptr stride) {
+        glVertexArrayVertexBuffer(*glvao, thisref, (GLuint)buf, offset, stride);
+    }
+
+    template<class T>
+    void vertex_array_binding::vertex_buffer(structured_buffer<T>& buf, GLintptr offset) {
+        glVertexArrayVertexBuffer(*glvao, thisref, (GLuint)buf, offset, sizeof(T));
+    }
+
+    template<class T>
+    void vertex_array_binding::vertex_buffer(buffer& buf, GLintptr offset) {
+        glVertexArrayVertexBuffer(*glvao, thisref, (GLuint)buf, offset, sizeof(T));
+    }
+
+    vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
+        //glvao = std::make_shared<vertex_array>(vao);
+        glvao = &vao;
         this->set_object(binding);
-        glEnableVertexArrayAttrib((GLuint)*glvao, *this);
+        glEnableVertexArrayAttrib(*glvao, thisref);
     }
-
-    vertex_array_attribute_class::~vertex_array_attribute_class() {
-        glDisableVertexArrayAttrib((GLuint)*glvao, *this);
-    }
-
-    void vertex_array_attribute_class::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
-        glVertexArrayAttribFormat((GLuint)*glvao, *this, size, type, normalized, relativeoffset);
-    }
-
-    void vertex_array_attribute_class::attrib_format_int(GLint size, GLenum type, GLuint relativeoffset) {
-        glVertexArrayAttribIFormat((GLuint)*glvao, *this, size, type, relativeoffset);
-    }
-
-    void vertex_array_attribute_class::attrib_format_long(GLint size, GLenum type, GLuint relativeoffset) {
-        glVertexArrayAttribLFormat((GLuint)*glvao, *this, size, type, relativeoffset);
-    }
-
-    void vertex_array_attribute_class::binding(GLuint binding) { // low level function
-        glVertexArrayAttribBinding((GLuint)*glvao, *this, binding);
-    }
-
-    void vertex_array_binding_class::vertex_buffer(buffer buf, GLintptr offset, GLintptr stride) {
-        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, stride);
-    }
-
-    template<class T>
-    void vertex_array_binding_class::vertex_buffer(structured_buffer<T> buf, GLintptr offset) {
-        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, sizeof(T));
-    }
-
-    template<class T>
-    void vertex_array_binding_class::vertex_buffer(buffer buf, GLintptr offset) {
-        glVertexArrayVertexBuffer((GLuint)*glvao, *this, *buf, offset, sizeof(T));
-    }
-
 
     
 };

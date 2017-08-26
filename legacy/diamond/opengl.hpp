@@ -8,10 +8,8 @@
 
 #include "glm/glm.hpp"
 
-#define thisref (*this)
-
 namespace dgl {
-    class base {
+    class base_class {
     protected:
         GLuint globj = 0;
         void set_object(GLuint obj) { globj = obj; }
