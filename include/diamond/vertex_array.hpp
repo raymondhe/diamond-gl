@@ -12,13 +12,13 @@ namespace dgl {
         //std::shared_ptr<vertex_array> glvao;
         vertex_array * glvao;
 
-    public:
         vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
             //glvao = std::make_shared<vertex_array>(vao);
             glvao = &vao;
             this->set_object(binding);
         }
-    
+
+    public:
         void vertex_buffer(buffer& buf, GLintptr offset = 0, GLintptr stride = 0);
 
         template<class T>
@@ -37,13 +37,14 @@ namespace dgl {
         //std::shared_ptr<vertex_array> glvao;
         vertex_array * glvao;
 
-    public:
         vertex_array_attribute(vertex_array& vao, GLuint binding = 0);
         //vertex_array_attribute(vertex_array& vao, GLuint binding = 0) {
         //    glvao = std::make_shared<vertex_array>(vao);
         //    this->set_object(binding);
         //    glEnableVertexArrayAttrib(*glvao, thisref);
         //}
+
+    public:
         ~vertex_array_attribute();
         void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0);
         void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0);
@@ -112,7 +113,7 @@ namespace dgl {
         //glvao = std::make_shared<vertex_array>(vao);
         glvao = &vao;
         this->set_object(binding);
-        glEnableVertexArrayAttrib(*glvao, thisref);
+        glEnableVertexArrayAttrib(vao, thisref);
     }
 
     
