@@ -2,6 +2,7 @@
 
 #include "opengl.hpp"
 #include "buffer.hpp"
+#include "enums.hpp"
 #include <memory>
 
 namespace dgl {
@@ -80,15 +81,15 @@ namespace dgl {
 
 
         // texture storage (accept GLM vector)
-        void storage(GLsizei levels, GLenum internalformat, GLsizei size) {
+        void storage(GLsizei levels, const _internal_format& internalformat, GLsizei size) {
             glTextureStorage1D(thisref, levels, internalformat, size);
         }
 
-        void storage(GLsizei levels, GLenum internalformat, glm::uvec2 size) {
+        void storage(GLsizei levels, const _internal_format& internalformat, glm::uvec2 size) {
             glTextureStorage2D(thisref, levels, internalformat, size.x, size.y);
         }
 
-        void storage(GLsizei levels, GLenum internalformat, glm::uvec3 size) {
+        void storage(GLsizei levels, const _internal_format& internalformat, glm::uvec3 size) {
             glTextureStorage3D(thisref, levels, internalformat, size.x, size.y, size.z);
         }
 
@@ -111,7 +112,7 @@ namespace dgl {
         void copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const;
 
         // texture of buffer 
-        void buffer(GLenum internalformat, buffer& buf){
+        void buffer(const _internal_format& internalformat, buffer& buf){
             glTextureBuffer(thisref, internalformat, buf);
         }
 

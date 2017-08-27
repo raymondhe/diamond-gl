@@ -1,6 +1,7 @@
 #pragma once
 
 #include "opengl.hpp"
+#include "enums.hpp"
 #include "buffer.hpp"
 #include "program.hpp"
 #include "texture.hpp"
