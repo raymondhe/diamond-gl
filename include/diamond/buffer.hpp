@@ -24,8 +24,9 @@ namespace dgl {
             for (intptr_t pt = 0; pt < n;pt++) {
                 buffers.push_back(buffer(objects+pt));
             }
-            glCreateBuffers(1, objects);
+            glCreateBuffers(n, objects);
             return buffers;
+            //return std::forward<std::vector<buffer>>(buffers);
         }
 
 

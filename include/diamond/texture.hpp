@@ -288,9 +288,14 @@ namespace dgl {
             this->set_value(binding);
         }
 
-        // create texture
-        texture&& create(){
-            return texture(thisref);
+        // create multiply texture
+        std::vector<texture>&& create(size_t n){
+            return texture::create(*this, n);
+        }
+
+        // create single texture
+        texture&& create() {
+            return texture(*this);
         }
 
         // context named binding
@@ -316,7 +321,8 @@ namespace dgl {
         for (intptr_t pt = 0; pt < n; pt++) {
             textures.push_back(texture(gltarget, objects + pt));
         }
-        glCreateTextures((GLenum)gltarget, 1, objects);
+        glCreateTextures((GLenum)gltarget, n, objects);
+        //return std::forward<std::vector<texture>>(textures);
         return textures;
     }
 
