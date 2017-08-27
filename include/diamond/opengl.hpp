@@ -22,4 +22,6 @@ namespace dgl {
         void allocate(const size_t cnt) { globj = new GLuint[cnt]; }
         operator const GLuint&() const { return (*globj); }
     };
+
+
 };

@@ -21,6 +21,11 @@ std::string fragmentShaderSource = "#version 460 core\n"
 "}\n\0";
 
 
+
+
+
+
+
 int main() {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -62,8 +67,8 @@ int main() {
     }
 
 
-    std::vector<dgl::buffer> vboarray(1, dgl::buffer_allocator());
-    std::vector<dgl::texture> txarray(1, dgl::texture_allocator(dgl::texture_target::sampler_2d));
+    std::vector<dgl::buffer> vboarray(2);
+    std::vector<dgl::texture> txarray(3);
 
 
     // create vertices and buffer
@@ -105,6 +110,8 @@ int main() {
     texture.parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     texture.parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
+
+    txarray[0].storage(1, dgl::internal_format::rgba32f, glm::uvec2(1, 1));
 
     // create GL texture binding
     auto textureBinding = dgl::texture_binding(0);

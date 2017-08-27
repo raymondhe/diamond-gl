@@ -55,10 +55,10 @@ set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_EXTENSIONS ON)
 
 if(MSVC)
-set (CMAKE_CXX_FLAGS "/EHsc /MD /std:c++17 -DMSVC")
+set (CMAKE_CXX_FLAGS "/EHsc /MD /std:c++latest -DMSVC")
 set (CMAKE_C_FLAGS "/EHsc")
 else()
-set (CMAKE_CXX_FLAGS "-std=c++17")
+set (CMAKE_CXX_FLAGS "-std=c++1z")
 set (CMAKE_C_FLAGS "")
 endif()
 
