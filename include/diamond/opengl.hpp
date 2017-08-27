@@ -18,6 +18,5 @@ namespace dgl {
         operator GLuint*() { return &globj; }
     public:
         operator GLuint() const { return globj; }
-        operator GLuint&() { return globj; }
     };
 };
