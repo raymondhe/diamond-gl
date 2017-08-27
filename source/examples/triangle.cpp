@@ -61,9 +61,14 @@ int main() {
         std::cerr << program.info_log() << std::endl;
     }
 
+
+    std::vector<dgl::buffer> vboarray(1, dgl::buffer_allocator());
+
+
     // create vertices and buffer
-    dgl::structured_buffer<glm::vec3> vbo;
-    vbo.data({{
+    //dgl::structured_buffer<glm::vec3> vbo;
+
+    vboarray[0].data<glm::vec3>({{
         {-0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
@@ -75,7 +80,7 @@ int main() {
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding(0);
-    binding.vertex_buffer(vbo, 0);
+    binding.vertex_buffer<glm::vec3>(vboarray[0], 0);
 
     auto attribute = vao.create_attribute(0);
     attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
@@ -88,7 +93,7 @@ int main() {
 
     // SSBO binding example 
     dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
-    ssbo_binding.bind(vbo);
+    ssbo_binding.bind(vboarray[0]);
 
 
     // create texture
