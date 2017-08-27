@@ -10,7 +10,8 @@ namespace dgl {
 
     class buffer: public base {
     public:
-        buffer() {glCreateBuffers(1, thisref);}
+        buffer(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
+        buffer() { base::allocate(1); glCreateBuffers(1, thisref); }
         ~buffer() {glDeleteBuffers(1, thisref);}
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
@@ -61,6 +62,21 @@ namespace dgl {
             return vctr;
         }
     };
+
+
+    class buffer_allocator : public std::allocator<buffer> {
+        buffer * allocate(std::size_t n, const void * hint = 0) {
+            GLuint * glbuffers = new GLuint[n];
+            buffer * dmbuffers = std::allocator<buffer>::allocate(n, hint);
+            glCreateBuffers(1, glbuffers);
+            for (intptr_t pt = 0; pt < n; pt++) {
+                dmbuffers[pt] = buffer(glbuffers + pt); //use allocation point
+            }
+            delete glbuffers;
+            return dmbuffers;
+        };
+    };
+
 
     template<class T>
     class structured_buffer: public buffer {
@@ -113,11 +129,17 @@ namespace dgl {
         _buffer_context * gltarget;
 
     public:
-        buffer_binding(_buffer_context& btarget, GLuint binding = 0) { gltarget = &btarget; this->set_object(binding); }
+        buffer_binding(_buffer_context& btarget, GLuint binding = 0) {
+            base::allocate(1);
+            gltarget = &btarget; 
+            this->set_value(binding); 
+        }
 
         ~buffer_binding();
         void bind(buffer& buf);
         void bind_range(buffer& buf, GLintptr offset = 0, GLsizei size = 1);
+        void bind(std::vector<buffer>& buf);
+        void bind_range(std::vector<buffer>& buf, GLintptr * offsets = nullptr, GLsizeiptr * sizes = nullptr);
     };
 
 
@@ -125,7 +147,8 @@ namespace dgl {
     class _buffer_context: public base {
     public:
         _buffer_context(GLuint binding = 0) {
-            this->set_object(binding);
+            base::allocate(1);
+            this->set_value(binding);
         }
 
         buffer_binding&& create_binding(GLuint binding = 0){
@@ -147,6 +170,8 @@ namespace dgl {
         glBindBufferBase(*gltarget, thisref, 0); 
     }
 
+
+    // basic bind support
     void buffer_binding::bind(buffer& buf) {
         glBindBufferBase(*gltarget, thisref, buf);
     }
@@ -156,6 +181,16 @@ namespace dgl {
     }
 
 
+    // multi-bind support
+    void buffer_binding::bind(std::vector<buffer>& buf) {
+        GLuint handler = buf[0];
+        glBindBuffersBase(*gltarget, thisref, buf.size(), /*buf.data()*/ &handler);
+    }
+
+    void buffer_binding::bind_range(std::vector<buffer>& buf, GLintptr * offsets, GLsizeiptr * sizes) {
+        GLuint handler = buf[0];
+        glBindBuffersRange(*gltarget, thisref, buf.size(), &handler, offsets, sizes);
+    }
 
 
     // bindables

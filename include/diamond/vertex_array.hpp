@@ -13,8 +13,9 @@ namespace dgl {
 
     public:
         vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
+            base::allocate(1);
             glvao = &vao;
-            this->set_object(binding);
+            this->set_value(binding);
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0, GLintptr stride = 0);
@@ -49,8 +50,13 @@ namespace dgl {
 
     class vertex_array: public base {
     public:
-        vertex_array() {glCreateVertexArrays(1, thisref);}
-        ~vertex_array() {glDeleteVertexArrays(1, thisref);}
+        vertex_array() {
+            base::allocate(1);
+            glCreateVertexArrays(1, thisref);
+        }
+        ~vertex_array() {
+            glDeleteVertexArrays(1, thisref);
+        }
 
         vertex_array_binding&& create_binding(GLuint binding = 0){
             return vertex_array_binding(thisref, binding);
@@ -102,8 +108,9 @@ namespace dgl {
 
     vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
         //glvao = std::make_shared<vertex_array>(vao);
+        base::allocate(1);
         glvao = &vao;
-        this->set_object(binding);
+        this->set_value(binding);
         glEnableVertexArrayAttrib(*glvao, thisref);
     }
 

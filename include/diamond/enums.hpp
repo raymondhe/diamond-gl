@@ -11,7 +11,8 @@ namespace dgl {
     public:
         _internal_format(GLenum internalFormat, GLenum generalFormat, GLenum generalType): _format(generalFormat), _type(generalType)
         {
-            this->set_object(internalFormat);
+            base::allocate(1);
+            this->set_value(internalFormat);
         }
 
         GLuint format() const {

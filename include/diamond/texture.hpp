@@ -152,6 +152,7 @@ namespace dgl {
     class sampler: public base {
     public:
         sampler(){
+            base::allocate(1);
             glCreateSamplers(1, thisref);
         }
 
@@ -218,7 +219,10 @@ namespace dgl {
     class texture_binding: public base {
     public:
         friend _texture_context;
-        texture_binding(GLuint binding = 0) {this->set_object(binding);}
+        texture_binding(GLuint binding = 0) {
+            base::allocate(1);
+            this->set_value(binding);
+        }
 
         ~texture_binding(){}
 
@@ -229,13 +233,28 @@ namespace dgl {
         void bind_texture(texture& tex) {
             glBindTextureUnit(thisref, tex);
         }
+
+
+        void bind_sampler(std::vector<sampler>& sam) {
+            const GLuint& handler = sam[0];
+            glBindSamplers(thisref, sam.size(), &handler);
+        }
+
+        void bind_texture(std::vector<texture>& tex) {
+            const GLuint& handler = tex[0];
+            glBindTextures(thisref, tex.size(), &handler);
+        }
+
     };
 
 
     // image binding
     class image: public base {
     public:
-        image(GLuint binding = 0) {this->set_object(binding);}
+        image(GLuint binding = 0) {
+            base::allocate(1);
+            this->set_value(binding);
+        }
 
         // bind image texture
         void bind_texture(texture& texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format) {
@@ -247,7 +266,10 @@ namespace dgl {
     // contexted texture binding
     class _texture_context: public base {
     public:
-        _texture_context(GLuint binding = 0) {this->set_object(binding);}        
+        _texture_context(GLuint binding = 0) {
+            base::allocate(1);
+            this->set_value(binding);
+        }
 
         // create texture
         texture&& create(){
@@ -261,6 +283,7 @@ namespace dgl {
     };
 
     texture::texture(_texture_context &gltarget) {
+        base::allocate(1);
         this->gltarget = &gltarget;//std::make_shared<_texture_context>(gltarget);
         glCreateTextures((GLenum)gltarget, 1, thisref);
     };

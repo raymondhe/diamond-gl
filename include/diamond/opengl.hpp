@@ -13,10 +13,13 @@
 namespace dgl {
     class base {
     protected:
-        GLuint globj = 0;
-        void set_object(GLuint obj) { globj = obj; }
-        operator GLuint*() { return &globj; }
+        GLuint * globj = new GLuint[1];
+        void set_object(GLuint &obj) { globj = &obj; }
+        void set_value(const GLuint& obj) { *globj = obj; };
+        operator GLuint*() { return globj; }
     public:
-        operator GLuint() const { return globj; }
+        base() { allocate(1); }
+        void allocate(const size_t cnt) { globj = new GLuint[cnt]; }
+        operator const GLuint&() const { return (*globj); }
     };
 };

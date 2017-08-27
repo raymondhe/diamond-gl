@@ -11,7 +11,11 @@ namespace dgl {
 
     class shader: public base {
     public:
-        shader(GLenum shaderType) {this->set_object(glCreateShader(shaderType));}
+        shader(GLenum shaderType) {
+            base::allocate(1);
+            GLuint shader = glCreateShader(shaderType);
+            this->set_value(shader);
+        }
 
         template<class T>
         T get_val(GLenum pname, T * params = nullptr) const {
@@ -73,7 +77,8 @@ namespace dgl {
     public:
 
         uniform(GLuint prog, GLuint location = 0) {
-            this->set_object(location);
+            base::allocate(1);
+            this->set_value(location);
             program = prog;
         }
 
@@ -127,19 +132,25 @@ namespace dgl {
 
     class program: public base {
     public:
-        program() {this->set_object(glCreateProgram());}
+        program() {
+            base::allocate(1);
+            GLuint program = glCreateProgram();
+            this->set_value(program);
+        }
 
         program(const std::vector<std::string>& shaders, GLenum shaderType){
             const GLchar ** parts = new const GLchar*[shaders.size()];
             for (int i = 0; i < shaders.size(); i++) {
                 parts[i] = shaders[i].c_str();
             }
-            (GLuint&)thisref = glCreateShaderProgramv(shaderType, shaders.size(), parts);
+            GLuint program = glCreateShaderProgramv(shaderType, shaders.size(), parts);
+            this->set_value(program);
         }
 
         program(std::string source, GLenum shaderType){
             const GLchar * src = source.c_str();
-            (GLuint&)thisref = glCreateShaderProgramv(shaderType, 1, &src);
+            GLuint program = glCreateShaderProgramv(shaderType, 1, &src);
+            this->set_value(program);
         }
 
         ~program() { glDeleteProgram(thisref); }
@@ -201,7 +212,10 @@ namespace dgl {
     // program pipeline
     class program_pipeline: public base {
     public:
-         program_pipeline() {glCreateProgramPipelines(1, thisref);}
+         program_pipeline() {
+             base::allocate(1);
+             glCreateProgramPipelines(1, thisref);
+         }
         ~program_pipeline() {glDeleteProgramPipelines(1, thisref);}
 
         void use_stages(GLbitfield stages, program& prog){
