@@ -63,7 +63,7 @@ int main() {
 
     // create vertices and buffer
     dgl::structured_buffer<glm::vec3> vbo;
-    vbo.data(std::vector<glm::vec3>{{
+    vbo.data({{
         {-0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
