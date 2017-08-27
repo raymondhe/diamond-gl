@@ -311,7 +311,7 @@ namespace dgl {
             this->gltarget = &gltarget;
         }
 
-        texture * allocate(std::size_t n, const void * hint = 0) {
+        texture * allocate(std::size_t n) {
             GLuint * glbuffers = new GLuint[n];
             std::vector<texture> dmbuffers;
             for (intptr_t pt = 0; pt < n; pt++) {
