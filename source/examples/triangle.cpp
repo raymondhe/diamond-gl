@@ -86,7 +86,6 @@ int main() {
     auto uniform = program.get_uniform<int>(0);
     uniform = 0;
 
-
     // SSBO binding example 
     dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
     ssbo_binding.bind(vbo);

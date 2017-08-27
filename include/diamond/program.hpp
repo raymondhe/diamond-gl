@@ -146,21 +146,21 @@ namespace dgl {
 
         
 
-        uniform&& get_uniform(GLuint location){
+        uniform&& get_uniform(GLuint location) const {
             return uniform((GLuint)thisref, location);
         }
 
-        uniform&& get_uniform(std::string name) {
+        uniform&& get_uniform(std::string name) const {
             return get_uniform(glGetUniformLocation(thisref, name.c_str()));
         }
 
         template<class T>
-        uniform_typed<T>&& get_uniform(GLuint location) {
+        uniform_typed<T>&& get_uniform(GLuint location) const {
             return uniform_typed<T>((GLuint)thisref, location);
         }
 
         template<class T>
-        uniform_typed<T>&& get_uniform(std::string name) {
+        uniform_typed<T>&& get_uniform(std::string name) const {
             return this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str()));
         }
 
@@ -188,7 +188,7 @@ namespace dgl {
             return params;
         }
 
-        std::string info_log(){
+        std::string info_log() const {
             GLsizei lsize = get_val<GLint>(GL_INFO_LOG_LENGTH);
             GLsizei size = lsize;
             GLchar * info = new GLchar[lsize];
