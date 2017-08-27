@@ -123,16 +123,17 @@ int main() {
     while (!glfwWindowShouldClose(window))
     {
         // managment
-        dgl::managment::program::use(program);
-        dgl::managment::vertex_array::bind(vao);
+        dgl::managment.use_program(program);
+        dgl::managment.bind_vertex_array(vao);
 
         // states
-        dgl::state::clear::color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
-        dgl::state::clear::depth(1.f);
+        dgl::options::blend.enable();
+        dgl::clear.color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+        dgl::clear.depth(1.f);
+        dgl::clear.enqueue(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // commands
-        dgl::commands::clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        dgl::commands::draw::arrays(GL_TRIANGLES, 0, 3);
+        dgl::draw_mode::triangles.arrays(0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
