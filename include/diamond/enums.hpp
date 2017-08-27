@@ -83,4 +83,29 @@ namespace dgl {
         _internal_format r32i(GL_R16I, GL_RED_INTEGER, GL_INT);
     };
 
+    // you can pass these bitfields
+    struct buffer_storage_bits {
+        GLenum map_read : 1;
+        GLenum map_write : 1;
+        GLenum map_invalidate_range : 1;
+        GLenum map_invalidate_buffer : 1;
+        GLenum map_flush_explicit : 1;
+        GLenum map_unsynchronized : 1;
+        GLenum map_persistent : 1;
+        GLenum map_coherent : 1;
+        GLenum dynamic_storage : 1;
+        GLenum client_storage : 1;
+        GLenum sparse_storage : 1;
+
+        buffer_storage_bits() {
+
+        }
+
+        buffer_storage_bits(GLenum bitfield) {
+            memcpy(this, &bitfield, sizeof(GLenum));
+        }
+    };
+
+
+
 };

@@ -42,8 +42,8 @@ namespace dgl {
             glNamedBufferSubData(thisref, offset, size, data);
         }
 
-        void storage(GLsizei size, const void *data, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
-            glNamedBufferStorage(thisref, size, data, flags);
+        void storage(GLsizei size, const void *data = nullptr, buffer_storage_bits flags = GL_DYNAMIC_STORAGE_BIT) {
+            glNamedBufferStorage(thisref, size, data, *(GLbitfield *)&flags);
         }
 
         void copydata(buffer& dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){

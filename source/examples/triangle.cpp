@@ -74,7 +74,8 @@ int main() {
     // create vertices and buffer
     //dgl::structured_buffer<glm::vec3> vbo;
 
-    vboarray[0].data<glm::vec3>({{
+    vboarray[0].storage(sizeof(glm::vec3) * 9);
+    vboarray[0].subdata<glm::vec3>(0, {{
         {-0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
