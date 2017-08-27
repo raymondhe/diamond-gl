@@ -85,24 +85,54 @@ namespace dgl {
 
     // you can pass these bitfields
     struct buffer_storage_bits {
-        GLenum map_read : 1;
-        GLenum map_write : 1;
-        GLenum map_invalidate_range : 1;
-        GLenum map_invalidate_buffer : 1;
-        GLenum map_flush_explicit : 1;
-        GLenum map_unsynchronized : 1;
-        GLenum map_persistent : 1;
-        GLenum map_coherent : 1;
-        GLenum dynamic_storage : 1;
-        GLenum client_storage : 1;
-        GLenum sparse_storage : 1;
+        union {
+            struct {
+                GLbitfield map_read : 1;
+                GLbitfield map_write : 1;
+                GLbitfield map_invalidate_range : 1;
+                GLbitfield map_invalidate_buffer : 1;
+                GLbitfield map_flush_explicit : 1;
+                GLbitfield map_unsynchronized : 1;
+                GLbitfield map_persistent : 1;
+                GLbitfield map_coherent : 1;
+                GLbitfield dynamic_storage : 1;
+                GLbitfield client_storage : 1;
+                GLbitfield sparse_storage : 1;
+            };
+            GLbitfield bitfield = 0;
+        };
 
         buffer_storage_bits() {
 
         }
 
-        buffer_storage_bits(GLenum bitfield) {
-            memcpy(this, &bitfield, sizeof(GLenum));
+        buffer_storage_bits(GLbitfield bitfield) {
+            this->bitfield = bitfield;
+        }
+    };
+
+
+
+
+    struct program_stage_bits {
+        union {
+            struct {
+                GLbitfield vertex_shader : 1;
+                GLbitfield fragment_shader : 1;
+                GLbitfield geometry_shader : 1;
+                GLbitfield tess_control_shader : 1;
+                GLbitfield tess_evalution_shader : 1;
+                GLbitfield computer_shader : 1;
+            };
+            GLbitfield bitfield = 0;
+        };
+
+        program_stage_bits() {
+
+        }
+
+        program_stage_bits(GLbitfield bitfield) {
+            this->bitfield = bitfield;
         }
     };
 

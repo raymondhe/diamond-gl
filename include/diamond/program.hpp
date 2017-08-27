@@ -218,8 +218,8 @@ namespace dgl {
          }
         ~program_pipeline() {glDeleteProgramPipelines(1, thisref);}
 
-        void use_stages(GLbitfield stages, program& prog){
-            glUseProgramStages(thisref, stages, prog);
+        void use_stages(program_stage_bits stages, program& prog){
+            glUseProgramStages(thisref, stages.bitfield, prog);
         }
 
         void active_program(program& prog){
