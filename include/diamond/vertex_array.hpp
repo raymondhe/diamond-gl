@@ -9,6 +9,8 @@ namespace dgl {
 
     class vertex_array_binding: public base {
         friend vertex_array;
+
+        //std::weak_ptr<vertex_array> glvao;
         //std::shared_ptr<vertex_array> glvao;
         vertex_array * glvao;
 
@@ -34,6 +36,7 @@ namespace dgl {
     class vertex_array_attribute: public base {
     protected:
         friend vertex_array;
+        //std::weak_ptr<vertex_array> glvao;
         //std::shared_ptr<vertex_array> glvao;
         vertex_array * glvao;
 
@@ -76,7 +79,7 @@ namespace dgl {
 
 
     vertex_array_attribute::~vertex_array_attribute() {
-        glDisableVertexArrayAttrib(*glvao, thisref);
+        //glDisableVertexArrayAttrib(*glvao, thisref);
     }
 
     void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
@@ -113,7 +116,7 @@ namespace dgl {
         //glvao = std::make_shared<vertex_array>(vao);
         glvao = &vao;
         this->set_object(binding);
-        glEnableVertexArrayAttrib(vao, thisref);
+        glEnableVertexArrayAttrib(*glvao, thisref);
     }
 
     
