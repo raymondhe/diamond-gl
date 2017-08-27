@@ -81,7 +81,7 @@ int main() {
     attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
     attribute.binding(binding);
 
-    /*
+    
     // program uniform constant example
     auto uniform = program.get_uniform(0u);
     uniform.set<int>(0);
@@ -104,7 +104,7 @@ int main() {
     // create GL texture binding
     auto textureBinding = dgl::texture_binding(0);
     textureBinding.bind_texture(texture);
-    */
+    
 
     // drawing
     while (!glfwWindowShouldClose(window))
