@@ -9,10 +9,25 @@ namespace dgl {
     class structured_buffer;
 
     class buffer: public base {
-    public:
+    protected:
         buffer(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
+
+    public:
+        
         buffer() { base::allocate(1); glCreateBuffers(1, thisref); }
         ~buffer() {glDeleteBuffers(1, thisref);}
+        
+        // new multi-bind creator
+        static std::vector<buffer> create(size_t n = 1) {
+            GLuint * objects = new GLuint[n];
+            std::vector<buffer> buffers;
+            for (intptr_t pt = 0; pt < n;pt++) {
+                buffers.push_back(buffer(objects+pt));
+            }
+            glCreateBuffers(1, objects);
+            return buffers;
+        }
+
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);

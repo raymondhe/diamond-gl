@@ -15,20 +15,34 @@ namespace dgl {
     protected:
         friend _texture_context;
         _texture_context * gltarget;
+        texture(_texture_context &gltarget, GLuint * allocation) {
+            this->set_object(*allocation);
+            this->gltarget = &gltarget;
+        };
 
     public:
         texture() {
             base::allocate(1);
         }
         texture(_texture_context &gltarget);
-        texture(GLuint * allocation, _texture_context &gltarget) {
-            this->set_object(*allocation);
-            this->gltarget = &gltarget;
-        };
 
         ~texture(){
             glDeleteTextures(1, thisref);
         }
+
+
+        // new multi-bind creator
+        static std::vector<texture> create(_texture_context &gltarget, size_t n = 1) {
+            GLuint * objects = new GLuint[n];
+            std::vector<texture> textures;
+            for (intptr_t pt = 0; pt < n; pt++) {
+                textures.push_back(texture(gltarget, objects + pt));
+            }
+            glCreateBuffers(1, objects);
+            return textures;
+        }
+
+
 
         _texture_context& target() const {
             return *gltarget;

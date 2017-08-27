@@ -66,9 +66,9 @@ int main() {
         std::cerr << program.info_log() << std::endl;
     }
 
-
-    std::vector<dgl::buffer> vboarray(2);
-    std::vector<dgl::texture> txarray(3);
+    // multiply creation
+    std::vector<dgl::buffer> vboarray = dgl::buffer::create(2);
+    std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
 
 
     // create vertices and buffer
