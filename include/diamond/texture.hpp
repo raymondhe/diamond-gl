@@ -13,15 +13,11 @@ namespace dgl {
     class texture: public base {
     protected:
         friend _texture_context;
-        //std::shared_ptr<_texture_context> gltarget;
         _texture_context * gltarget;
-        texture(_texture_context &gltarget);
-        //texture(_texture_context &gltarget) {
-        //    this->gltarget = std::make_shared<_texture_context>(gltarget);
-        //    glCreateTextures((GLenum)gltarget, 1, thisref);
-        //};
 
     public:
+        texture(_texture_context &gltarget);
+
         ~texture(){
             glDeleteTextures(1, thisref);
         }

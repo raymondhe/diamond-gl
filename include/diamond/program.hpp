@@ -49,11 +49,11 @@ namespace dgl {
             glShaderSource(thisref, 1, &cstr, &size);
         }
 
-        void binary(std::vector<GLchar> binary, GLenum binType = GL_SPIR_V_BINARY){
+        void binary(const std::vector<GLchar>& binary, GLenum binType = GL_SPIR_V_BINARY){
             glShaderBinary(1, thisref, binType, binary.data(), binary.size());
         }
 
-        void specialize(std::string entry_point = "main", std::vector<GLuint> constantIndex = std::vector<GLuint>(0), GLuint * constantValue = nullptr){
+        void specialize(std::string entry_point = "main", const std::vector<GLuint> &constantIndex = std::vector<GLuint>(0), const GLuint * constantValue = nullptr){
             glSpecializeShader(thisref, entry_point.c_str(), constantIndex.size(), constantIndex.data(), constantValue);
         }
 
@@ -69,12 +69,13 @@ namespace dgl {
     protected:
         friend program;
         GLuint program = 0;
-        uniform(GLuint prog, GLuint location = 0){
+
+    public:
+
+        uniform(GLuint prog, GLuint location = 0) {
             this->set_object(location);
             program = prog;
         }
-
-    public:
 
         // base templates
         template<class T>
@@ -88,13 +89,37 @@ namespace dgl {
         }
 
         template<class T>
-        void set(std::vector<T> values){
+        void set(const std::vector<T>& values){
             if  (typeid(T) == typeid(int)) glProgramUniform1iv(program, thisref, value.size(), value.data());
             if  (typeid(T) == typeid(GLuint)) glProgramUniform1uiv(program, thisref, value.size(), value.data());
             if  (typeid(T) == typeid(float)) glProgramUniform1fv(program, thisref, value.size(), value.data());
             if  (typeid(T) == typeid(double)) glProgramUniform1dv(program, thisref, value.size(), value.data());
             if  (typeid(T) == typeid(int64_t)) glProgramUniform1iv64ARB(program, thisref, value.size(), value.data());
             if  (typeid(T) == typeid(uint64_t)) glProgramUniform1uiv64ARB(program, thisref, value.size(), value.data());
+        }
+    };
+
+    template<class T>
+    class uniform_typed : public uniform {
+    public:
+        uniform_typed(GLuint prog, GLuint location = 0): uniform(prog, location) {}
+
+        void set(T value) {
+            uniform::set<T>(value);
+        }
+
+        void set(const std::vector<T>& values) {
+            uniform::set<T>(values);
+        }
+
+        uniform_typed<T>& operator=(T value) {
+            this->set(value);
+            return thisref;
+        }
+        
+        uniform_typed<T>& operator=(const std::vector<T>& values) {
+            this->set(values);
+            return thisref;
         }
     };
 
@@ -128,6 +153,17 @@ namespace dgl {
         uniform&& get_uniform(std::string name) {
             return get_uniform(glGetUniformLocation(thisref, name.c_str()));
         }
+
+        template<class T>
+        uniform_typed<T>&& get_uniform(GLuint location) {
+            return uniform_typed<T>((GLuint)thisref, location);
+        }
+
+        template<class T>
+        uniform_typed<T>&& get_uniform(std::string name) {
+            return this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str()));
+        }
+
 
 
         void attach(shader& shad){

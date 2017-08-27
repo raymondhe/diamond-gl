@@ -110,10 +110,11 @@ namespace dgl {
     class buffer_binding: public base {
     protected:
         friend _buffer_context;
-        _buffer_context& gltarget;
-        buffer_binding(_buffer_context& btarget, GLuint binding = 0) : gltarget(btarget) { this->set_object(binding); }
+        _buffer_context * gltarget;
 
     public:
+        buffer_binding(_buffer_context& btarget, GLuint binding = 0) { gltarget = &btarget; this->set_object(binding); }
+
         ~buffer_binding();
         void bind(buffer& buf);
         void bind_range(buffer& buf, GLintptr offset = 0, GLsizei size = 1);
@@ -123,7 +124,9 @@ namespace dgl {
     // contextual targeted bindings
     class _buffer_context: public base {
     public:
-        _buffer_context(GLuint binding = 0) {this->set_object(binding);}
+        _buffer_context(GLuint binding = 0) {
+            this->set_object(binding);
+        }
 
         buffer_binding&& create_binding(GLuint binding = 0){
             return buffer_binding(thisref, binding);
@@ -139,15 +142,17 @@ namespace dgl {
     };
 
 
-
-    buffer_binding:: ~buffer_binding() { glBindBufferBase(gltarget, thisref, 0); } // unbind
+    
+    buffer_binding:: ~buffer_binding() { // unbind
+        glBindBufferBase(*gltarget, thisref, 0); 
+    }
 
     void buffer_binding::bind(buffer& buf) {
-        glBindBufferBase(gltarget, thisref, buf);
+        glBindBufferBase(*gltarget, thisref, buf);
     }
 
     void buffer_binding::bind_range(buffer& buf, GLintptr offset, GLsizei size) {
-        glBindBufferRange(gltarget, thisref, buf, offset, size);
+        glBindBufferRange(*gltarget, thisref, buf, offset, size);
     }
 
 

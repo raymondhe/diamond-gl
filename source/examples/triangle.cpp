@@ -83,17 +83,17 @@ int main() {
 
     
     // program uniform constant example
-    auto uniform = program.get_uniform(0u);
-    uniform.set<int>(0);
+    auto uniform = program.get_uniform<int>(0);
+    uniform = 0;
 
 
     // SSBO binding example 
-    auto ssbo_binding = dgl::buffer_target::shader_storage.create_binding(0); // get SSBO binding by ID
+    dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
     ssbo_binding.bind(vbo);
 
 
     // create texture
-    auto texture = dgl::texture_target::t_2d.create();
+    dgl::texture texture(dgl::texture_target::t_2d);
     texture.storage(1, GL_RGBA32F, glm::uvec2(1, 1)); // 2d texture
     texture.parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture.parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
