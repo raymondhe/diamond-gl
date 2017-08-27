@@ -63,6 +63,7 @@ int main() {
 
 
     std::vector<dgl::buffer> vboarray(1, dgl::buffer_allocator());
+    std::vector<dgl::texture> txarray(1, dgl::texture_allocator(dgl::texture_target::sampler_2d));
 
 
     // create vertices and buffer

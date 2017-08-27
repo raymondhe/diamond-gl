@@ -65,15 +65,15 @@ namespace dgl {
 
 
     class buffer_allocator : public std::allocator<buffer> {
+    public:
         buffer * allocate(std::size_t n, const void * hint = 0) {
             GLuint * glbuffers = new GLuint[n];
-            buffer * dmbuffers = std::allocator<buffer>::allocate(n, hint);
-            glCreateBuffers(1, glbuffers);
+            std::vector<buffer> dmbuffers;
             for (intptr_t pt = 0; pt < n; pt++) {
-                dmbuffers[pt] = buffer(glbuffers + pt); //use allocation point
+                dmbuffers.push_back(buffer(glbuffers + pt)); //use allocation point
             }
-            delete glbuffers;
-            return dmbuffers;
+            glCreateBuffers(n, glbuffers);
+            return dmbuffers.data();
         };
     };
 
