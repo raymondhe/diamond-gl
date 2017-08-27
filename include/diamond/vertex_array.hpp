@@ -25,6 +25,8 @@ namespace dgl {
 
         template<class T>
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
+
+        // multi-bind not support, because C++ does not support natively different type of vectors
     };
 
 
