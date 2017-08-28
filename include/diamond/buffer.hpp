@@ -62,6 +62,10 @@ namespace dgl {
 
     public:
         
+        template<class S>
+        structured_buffer<T>(structured_buffer<S>& another) {
+            this->set_object((GLuint *)another);
+        }
         structured_buffer<T>() : void_buffer<T>() {};
 
         // new multi-bind creator

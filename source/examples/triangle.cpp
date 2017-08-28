@@ -74,6 +74,8 @@ int main() {
     std::tuple<dgl::structured_buffer<glm::vec3>> bufs = dgl::buffer::create<glm::vec3>();
     auto[vbo] = bufs;
 
+    dgl::buffer u8buf(vbo); // now type conversion is legal
+
     //dgl::buffer vbo;
     //vbo.storage(3 * sizeof(glm::vec3));
     vbo.storage(3);

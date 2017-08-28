@@ -19,6 +19,7 @@ namespace dgl {
     protected:
         GLuint * globj = new GLuint[1];
         void set_object(GLuint &obj) { globj = &obj; }
+        void set_object(GLuint *obj) { globj =  obj; }
         void set_value(const GLuint& obj) { *globj = obj; };
         operator GLuint*() { return globj; }
     public:
