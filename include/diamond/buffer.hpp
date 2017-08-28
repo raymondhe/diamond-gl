@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "opengl.hpp"
 #include <vector>
@@ -13,6 +13,8 @@ namespace dgl {
 
     template<class T>
     class void_buffer: public base {
+        using buffer = void_buffer<T>;
+
     protected:
         //void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
 
@@ -50,7 +52,7 @@ namespace dgl {
         }
 
         template<typename... T>
-        static std::tuple<void_buffer<T>...>&& create_tuple() {
+        static std::tuple<void_buffer<T>...>&& create() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
@@ -143,14 +145,12 @@ namespace dgl {
         }
 
         template<typename... T>
-        static std::tuple<structured_buffer<T>...>&& create_tuple() {
+        static std::tuple<structured_buffer<T>...>&& create() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
             return _make_tuple<T...>(objects);
         }
-
-
 
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
@@ -164,6 +164,7 @@ namespace dgl {
         void subdata(GLintptr offset, GLsizei size, const void *data){
             buffer::subdata(offset, size * sizeof(T), data);
         }
+
 
         void storage(GLsizei size, const void *data = nullptr, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
             buffer::storage(size * sizeof(T), data, flags);
@@ -189,11 +190,45 @@ namespace dgl {
         std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
             return buffer::get_subdata<T>(offset, vctr);
         }
+
+
+
+
+
+
+        // data from vector
+        template<class T>
+        void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW) {
+            buffer::data(data.size() * sizeof(T), data.data(), usage);
+        }
+
+        // fill subdata by vector
+        template<class T>
+        void subdata(GLintptr offset, const std::vector<T>& data) {
+            buffer::subdata(offset, data.size() * sizeof(T), data.data());
+        }
+
+        // get subdata by range
+        template<class T>
+        std::vector<T>& get_subdata(GLintptr offset, GLsizei size) const {
+            std::vector<T> vctr(size);
+            buffer::get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
+            return vctr;
+        }
+
+        // get subdata by full vector
+        template<class T>
+        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
+            buffer::get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
+            return vctr;
+        }
+
+
     };
 
 
     // buffer is structured_buffer<void>;
-    using buffer = structured_buffer<void>;
+    using buffer = structured_buffer<GLubyte>;
 
 
 

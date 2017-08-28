@@ -67,28 +67,26 @@ int main() {
     }
 
     // multiply creation
-    std::vector<dgl::structured_buffer<glm::vec3>> vboarray = dgl::structured_buffer<glm::vec3>::create(2);
-    std::tuple<dgl::structured_buffer<int>, dgl::buffer> &tpl = dgl::buffer::create_tuple<int, void>();
-
     std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
 
-    // create vertices and buffer
-    //dgl::structured_buffer<glm::vec3> vbo;
-
-    vboarray[0].storage(3);
-    vboarray[0].subdata(0, {{
-        {-0.5f, -0.5f, 0.0f }, // left  
+    // create buffer
+    dgl::buffer vbo;
+    vbo.storage(3 * sizeof(glm::vec3));
+    vbo.subdata<glm::vec3>(0, {{
+        { -0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
     }});
 
+    // create tuple of buffers (ideal for multi-bind)
+    std::tuple<dgl::buffer, dgl::buffer>& tpl = dgl::buffer::create<GLubyte, GLubyte>();
 
 
     // create VAO
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding(0);
-    binding.vertex_buffer<glm::vec3>(vboarray[0], 0);
+    binding.vertex_buffer<glm::vec3>(vbo, 0);
 
     auto attribute = vao.create_attribute(0);
     attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
@@ -101,7 +99,7 @@ int main() {
 
     // SSBO binding example 
     dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
-    ssbo_binding.bind(vboarray[0]);
+    ssbo_binding.bind(vbo);
 
 
     // create texture
