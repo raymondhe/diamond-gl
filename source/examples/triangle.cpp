@@ -87,7 +87,7 @@ int main() {
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding(0);
-    binding.vertex_buffer(bufs, new GLintptr[1]{0});
+    binding.vertex_buffer(bufs);
     //binding.vertex_buffer<glm::vec3>(vbo, 0);
 
     auto attribute = vao.create_attribute(0);

@@ -34,7 +34,7 @@ namespace dgl {
 
 
         template<class... T>
-        void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets);
+        void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets = nullptr);
     };
 
 
@@ -126,6 +126,7 @@ namespace dgl {
         GLsizei * strides = new GLsizei[N];
         get_globj(buffers, buf);
         get_stride<T...>(strides, buf);
+        if (!offsets) offsets = new GLintptr[N]{0};
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);
     }
 
