@@ -4,22 +4,35 @@
 
 namespace dgl {
 
-    class _internal_format: public base {
-        GLuint _format;
-        GLuint _type;
+    class _internal_format {
+        GLenum _internal;
+        GLenum _format;
+        GLenum _type;
 
     public:
-        _internal_format(GLenum internalFormat, GLenum generalFormat, GLenum generalType): _format(generalFormat), _type(generalType)
+        // for fast creation
+        _internal_format(GLenum internalFormat) : _internal(internalFormat)
         {
-            base::allocate(1);
-            this->set_value(internalFormat);
         }
 
-        GLuint format() const {
+        // for choicable selection
+        _internal_format(GLenum internalFormat, GLenum generalFormat, GLenum generalType): _internal(internalFormat), _format(generalFormat), _type(generalType)
+        {
+        }
+
+        operator GLenum() {
+            return _internal;
+        }
+
+        GLenum internal() const {
+            return _internal;
+        }
+
+        GLenum format() const {
             return _format;
         }
 
-        GLuint type() const {
+        GLenum type() const {
             return _type;
         }
     };

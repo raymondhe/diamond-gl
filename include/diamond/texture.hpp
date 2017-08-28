@@ -95,15 +95,15 @@ namespace dgl {
 
         // texture storage (accept GLM vector)
         void storage(GLsizei levels, const _internal_format& internalformat, GLsizei size) {
-            glTextureStorage1D(thisref, levels, internalformat, size);
+            glTextureStorage1D(thisref, levels, internalformat.internal(), size);
         }
 
         void storage(GLsizei levels, const _internal_format& internalformat, glm::uvec2 size) {
-            glTextureStorage2D(thisref, levels, internalformat, size.x, size.y);
+            glTextureStorage2D(thisref, levels, internalformat.internal(), size.x, size.y);
         }
 
         void storage(GLsizei levels, const _internal_format& internalformat, glm::uvec3 size) {
-            glTextureStorage3D(thisref, levels, internalformat, size.x, size.y, size.z);
+            glTextureStorage3D(thisref, levels, internalformat.internal(), size.x, size.y, size.z);
         }
 
 
@@ -126,7 +126,7 @@ namespace dgl {
 
         // texture of buffer 
         void buffer(const _internal_format& internalformat, buffer& buf){
-            glTextureBuffer(thisref, internalformat, buf);
+            glTextureBuffer(thisref, internalformat.internal(), buf);
         }
 
 
