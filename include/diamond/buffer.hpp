@@ -183,7 +183,8 @@ namespace dgl {
 
 
     // buffer is structured_buffer<void>;
-    using buffer = structured_buffer<GLubyte>;
+    using buffer_type = GLubyte;
+    using buffer = structured_buffer<buffer_type>;
 
 
 
