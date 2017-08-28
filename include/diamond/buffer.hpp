@@ -190,11 +190,11 @@ namespace dgl {
         template<typename T>
         void bind_range(structured_buffer<T>& buf, GLintptr offset = 0, GLsizei size = 1);
 
-        template<typename T>
-        void bind(std::vector<structured_buffer<T>>& buf);
+        template<typename... T>
+        void bind(std::tuple<structured_buffer<T>...>& buf);
 
-        template<typename T>
-        void bind_range(std::vector<structured_buffer<T>>& buf, GLintptr * offsets = nullptr, GLsizeiptr * sizes = nullptr);
+        template<typename... T>
+        void bind_range(std::tuple<structured_buffer<T>...>& buf, GLintptr * offsets = nullptr, GLsizeiptr * sizes = nullptr);
     };
 
 
@@ -238,16 +238,15 @@ namespace dgl {
     }
 
     // multi-bind support
-    template<typename T>
-    void buffer_binding::bind(std::vector<structured_buffer<T>>& buf) {
-        GLuint handler = buf[0];
-        glBindBuffersBase(*gltarget, thisref, buf.size(), /*buf.data()*/ &handler);
+    template<typename... T>
+    void buffer_binding::bind(std::tuple<structured_buffer<T>...>& buf) {
+        glBindBuffersBase(*gltarget, thisref, sizeof...(T), get_globj_wrap(buf));
     }
 
-    template<typename T>
-    void buffer_binding::bind_range(std::vector<structured_buffer<T>>& buf, GLintptr * offsets, GLsizeiptr * sizes) {
-        GLuint handler = buf[0];
-        glBindBuffersRange(*gltarget, thisref, buf.size(), &handler, offsets, sizes);
+    template<typename... T>
+    void buffer_binding::bind_range(std::tuple<structured_buffer<T>...>& buf, GLintptr * offsets, GLsizeiptr * sizes)
+    {
+        glBindBuffersRange(*gltarget, thisref, sizeof...(T), get_globj_wrap(buf), offsets, sizes);
     }
 
 

@@ -58,6 +58,11 @@ namespace dgl {
         return get_globj_impl(ptr, t);
     }
 
-
+    template <class... T>
+    constexpr GLuint *  get_globj_wrap(std::tuple<T...> &t) {
+        GLuint * ptr = new GLuint[sizeof...(T)];
+        get_globj_impl(ptr, t);
+        return ptr;
+    }
 
 };
