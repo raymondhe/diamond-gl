@@ -65,19 +65,19 @@ namespace dgl {
 
         // create tuple of buffers (only voids support)
         template<typename... T, size_t... Is>
-        static std::tuple<structured_buffer<T>...>&& _make_tuple(GLuint * a, std::index_sequence<Is...>)
+        static std::tuple<structured_buffer<T>...> _make_tuple(GLuint * a, std::index_sequence<Is...>)
         {
-            return std::make_tuple(structured_buffer<T>(&a[Is])...);
+            return std::make_tuple(structured_buffer<T>(a + Is)...);
         }
 
         template<typename... T>
-        static std::tuple<structured_buffer<T>...>&& _make_tuple(GLuint * a)
+        static std::tuple<structured_buffer<T>...> _make_tuple(GLuint * a)
         {
             return _make_tuple<T...>(a, std::index_sequence_for<T...>{});
         }
 
         template<typename... T>
-        static std::tuple<structured_buffer<T>...>&& create() {
+        static std::tuple<structured_buffer<T>...> create() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);

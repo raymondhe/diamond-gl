@@ -79,8 +79,10 @@ int main() {
     }});
 
     // create tuple of buffers (ideal for multi-bind)
-    std::tuple<dgl::buffer, dgl::buffer>& tpl = dgl::buffer::create<GLubyte, GLubyte>();
+    //std::tuple<dgl::buffer, dgl::buffer>& tpl = dgl::buffer::create<GLubyte, GLubyte>();
 
+    // destructive creation of buffers
+    auto [buffer1, buffer2] = dgl::buffer::create<GLubyte, GLubyte>();
 
     // create VAO
     dgl::vertex_array vao;
