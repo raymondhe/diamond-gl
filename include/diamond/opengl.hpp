@@ -10,8 +10,9 @@
 #include <tuple>
 
 #define thisref (*this)
+#define NS_NAME dgl
 
-namespace dgl {
+namespace NS_NAME {
 
 
 

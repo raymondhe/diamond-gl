@@ -2,7 +2,7 @@
 
 #include "opengl.hpp"
 
-namespace dgl {
+namespace NS_NAME {
 
     class _internal_format {
         GLenum _internal;

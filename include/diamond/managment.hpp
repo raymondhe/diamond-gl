@@ -4,19 +4,19 @@
 #include "program.hpp"
 #include "vertex_array.hpp"
 
-namespace dgl {
+namespace NS_NAME {
 
     class _managment {
     public:
-        void use_program(dgl::program& prog){
+        void use_program(program& prog){
             glUseProgram((GLuint)prog);
         }
 
-        void bind_program_pipeline(dgl::program_pipeline& ppl){
+        void bind_program_pipeline(program_pipeline& ppl){
             glBindProgramPipeline((GLuint)ppl);
         }
        
-        void bind_vertex_array(dgl::vertex_array& vao) {
+        void bind_vertex_array(vertex_array& vao) {
             glBindVertexArray((GLuint)vao);
         }
     };

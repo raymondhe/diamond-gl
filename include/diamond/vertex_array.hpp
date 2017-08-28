@@ -6,7 +6,7 @@
 #include <tuple>
 #include <utility>
 
-namespace dgl {
+namespace NS_NAME {
 
     class vertex_array;
 

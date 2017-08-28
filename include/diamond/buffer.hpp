@@ -5,7 +5,7 @@
 #include <tuple>
 #include <utility>
 
-namespace dgl {
+namespace NS_NAME {
 
 
     template<class T>

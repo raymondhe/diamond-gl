@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace dgl {
+namespace NS_NAME {
 
     class program;
 

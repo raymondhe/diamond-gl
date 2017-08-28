@@ -5,7 +5,7 @@
 #include "enums.hpp"
 #include <memory>
 
-namespace dgl {
+namespace NS_NAME {
 
     class _texture_context;
 
