@@ -19,7 +19,9 @@ namespace dgl {
     public:
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() {glDeleteBuffers(1, thisref);}
+
+        // don't know why, but all linked objects removes its
+        //~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);

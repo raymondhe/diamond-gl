@@ -70,13 +70,14 @@ int main() {
     std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
 
     // create buffer
-    dgl::buffer vbo;
-    std::tuple<dgl::buffer> bufs = dgl::buffer::create<GLubyte>();
-    //auto[vbo] = bufs;
+    //dgl::buffer vbo;
+    std::tuple<dgl::structured_buffer<glm::vec3>> bufs = dgl::buffer::create<glm::vec3>();
+    auto[vbo] = bufs;
 
     //dgl::buffer vbo;
-    vbo.storage(3 * sizeof(glm::vec3));
-    vbo.subdata<glm::vec3>(0, {{
+    //vbo.storage(3 * sizeof(glm::vec3));
+    vbo.storage(3);
+    vbo.subdata(0, {{
         { -0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
@@ -86,8 +87,8 @@ int main() {
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding(0);
-    //binding.vertex_buffer(tpl, new GLintptr[1]{0});
-    binding.vertex_buffer<glm::vec3>(vbo, 0);
+    binding.vertex_buffer(bufs, new GLintptr[1]{0});
+    //binding.vertex_buffer<glm::vec3>(vbo, 0);
 
     auto attribute = vao.create_attribute(0);
     attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
