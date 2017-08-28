@@ -181,19 +181,6 @@ namespace dgl {
 
 
 
-    /*
-    template <class... T, size_t... Is>
-    constexpr decltype(auto) get_stride_impl(GLsizei * ptr, std::index_sequence<Is...>) {
-        //return std::make_tuple((GLsizei)sizeof(typename std::tuple_element<Is, std::tuple<T...>>::type)...);
-        ptr[Is] = (GLsizei)sizeof(typename std::tuple_element<Is, std::tuple<T...>>::type);
-    }
-
-    template <class... T>
-    constexpr decltype(auto) get_stride(GLsizei * ptr) {
-        return get_stride_impl<T...>(ptr, std::make_index_sequence<sizeof...(T)>{});
-    }
-    */
-
     template<class... T>
     void vertex_array_binding::vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets) {
         constexpr size_t N = sizeof...(T);
