@@ -47,6 +47,11 @@ namespace dgl {
     protected:
         using buffer = void_buffer<T>;
 
+        template<class T>
+        friend class structured_buffer;
+
+        structured_buffer<T>(GLuint * allocationPointer) : void_buffer<T>(allocationPointer) {};
+
         // create tuple of buffers
         template<typename... T, size_t... Is>
         static decltype(auto) _make_tuple(GLuint * a, std::index_sequence<Is...>)
@@ -57,7 +62,6 @@ namespace dgl {
 
     public:
         
-        structured_buffer<T>(GLuint * allocationPointer) : void_buffer<T>(allocationPointer) {};
         structured_buffer<T>() : void_buffer<T>() {};
 
         // new multi-bind creator
