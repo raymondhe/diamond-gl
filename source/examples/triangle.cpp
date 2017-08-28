@@ -67,7 +67,7 @@ int main() {
     }
 
     // multiply creation
-    std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
+    std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::texture2d, 3);
 
     // create buffer
     //dgl::buffer vbo;
@@ -107,7 +107,7 @@ int main() {
 
 
     // create texture
-    dgl::texture texture(dgl::texture_target::sampler_2d);
+    dgl::texture texture(dgl::texture_target::texture2d);
     texture.storage(1, dgl::internal_format::rgba32f, glm::uvec2(1, 1)); // 2d texture
     texture.parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture.parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -133,7 +133,7 @@ int main() {
         dgl::options::blend.enable();
         dgl::clear.color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         dgl::clear.depth(1.f);
-        dgl::clear.enqueue(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        dgl::clear.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // commands
         dgl::draw_mode::triangles.arrays(0, 3);

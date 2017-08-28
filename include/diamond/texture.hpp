@@ -330,14 +330,14 @@ namespace dgl {
 
     // texture targets
     namespace texture_target {
-        _texture_context sampler_cube(GL_TEXTURE_CUBE_MAP);
-        _texture_context sampler_buffer(GL_TEXTURE_BUFFER);
-        _texture_context sampler_1d(GL_TEXTURE_1D);
-        _texture_context sampler_2d(GL_TEXTURE_2D);
-        _texture_context sampler_3d(GL_TEXTURE_3D);
-        _texture_context sampler_2d_msaa(GL_TEXTURE_2D_MULTISAMPLE);
-        _texture_context sampler_1d_array(GL_TEXTURE_1D_ARRAY);
-        _texture_context sampler_2d_array(GL_TEXTURE_2D_ARRAY);
+        _texture_context texture_cube(GL_TEXTURE_CUBE_MAP);
+        _texture_context texture_buffer(GL_TEXTURE_BUFFER);
+        _texture_context texture1d(GL_TEXTURE_1D);
+        _texture_context texture2d(GL_TEXTURE_2D);
+        _texture_context texture3d(GL_TEXTURE_3D);
+        _texture_context texture2d_msaa(GL_TEXTURE_2D_MULTISAMPLE);
+        _texture_context texture1d_array(GL_TEXTURE_1D_ARRAY);
+        _texture_context texture2d_array(GL_TEXTURE_2D_ARRAY);
     };
 
 

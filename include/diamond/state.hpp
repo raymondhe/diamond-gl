@@ -48,7 +48,7 @@ namespace dgl {
             glClearDepth(depth);
         }
 
-        void enqueue(GLbitfield cbits) {
+        void clear(GLbitfield cbits) {
             glClear(cbits);
         }
     };
