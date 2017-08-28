@@ -10,6 +10,41 @@ namespace dgl {
     class _texture_context;
 
 
+
+    class texture;
+
+    class texture_level : public base {
+        friend texture;
+        texture * gltex;
+
+    public:
+        ~texture_level() {};
+        texture_level(texture& tex, GLuint level = 0);
+
+        void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
+        void subimage(glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels);
+        void subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels);
+
+
+        void get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const;
+
+        template<class T>
+        std::vector<T>& get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer) const;
+
+        template<class T>
+        std::vector<T>& get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const;
+
+        template<class T>
+        T * get_parameter(GLenum pname, T * params = nullptr) const;
+
+        template<class T>
+        T get_parameter_val(GLenum pname, T * params = nullptr) const {
+            return *(this->get_parameter(pname, params));
+        }
+    };
+
+
+
     // universal texture object
     class texture: public base {
     protected:
@@ -34,6 +69,11 @@ namespace dgl {
         // new multi-bind creator
         static std::vector<texture> create(_texture_context &gltarget, size_t n = 1);
 
+
+
+        texture_level get_level(GLint level = 0) {
+            return texture_level(thisref, level);
+        }
 
 
         _texture_context& target() const {
@@ -158,9 +198,47 @@ namespace dgl {
     };
 
 
+    texture_level::texture_level(texture& tex, GLuint level) {
+        base::allocate(1);
+        gltex = &tex;
+        this->set_value(level);
+    }
 
+    void texture_level::subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels) {
+        gltex->subimage(thisref, offset, size, format, type, pixels);
+    };
 
+    void texture_level::subimage(glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels) {
+        gltex->subimage(thisref, offset, size, format, type, pixels);
+    };
 
+    void texture_level::subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels) {
+        gltex->subimage(thisref, offset, size, format, type, pixels);
+    };
+
+    void texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const {
+        gltex->get_image_subdata(thisref, offset, size, format, type, buffersize, pixels);
+    }
+
+    // get subimage to vector
+    template<class T>
+    std::vector<T>& texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer) const {
+        return gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffer);
+    }
+
+    // get subimage as vector
+    template<class T>
+    std::vector<T>& texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
+        return gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffersize);
+    }
+
+    template<class T>
+    T * texture_level::get_parameter(GLenum pname, T * params) const {
+        if (!params) params = { 0 };
+        if (typeid(T) == typeid(int)) glGetTextureLevelParameteriv(*gltex, thisref, pname, (int*)params);
+        if (typeid(T) == typeid(float)) glGetTextureLevelParameterfv(*gltex, thisref, pname, (float*)params);
+        return params;
+    }
 
 
 

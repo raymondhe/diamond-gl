@@ -66,9 +66,6 @@ int main() {
         std::cerr << program.info_log() << std::endl;
     }
 
-    // multiply creation
-    std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::texture2d, 3);
-
     // create buffer
     //dgl::buffer vbo;
     auto bufs = dgl::buffer::create<glm::vec3, glm::vec2>();
@@ -115,8 +112,8 @@ int main() {
     texture.parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     texture.parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-
-    txarray[0].storage(1, dgl::internal_format::rgba32f, glm::uvec2(1, 1));
+    dgl::texture_level texlv = texture.get_level(0); // get this mip level
+    
 
     // create GL texture binding
     auto textureBinding = dgl::texture_binding(0);
