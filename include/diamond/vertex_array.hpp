@@ -122,10 +122,8 @@ namespace dgl {
     template<class... T>
     void vertex_array_binding::vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets) {
         constexpr size_t N = sizeof...(T);
-        GLuint * buffers = new GLuint[N];
-        GLsizei * strides = new GLsizei[N];
-        get_globj(buffers, buf);
-        get_stride<T...>(strides, buf);
+        GLuint * buffers = get_globj_wrap(buf);;
+        GLsizei * strides = get_stride_wrap<T...>();
         if (!offsets) offsets = new GLintptr[N]{0};
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);
     }

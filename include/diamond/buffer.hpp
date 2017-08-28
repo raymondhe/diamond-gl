@@ -270,40 +270,6 @@ namespace dgl {
     }
 
 
-
-
-
-    // crop tuple element
-    template <class Tm, class... T, size_t... Is>
-    constexpr decltype(auto) get_stride_reduce_impl(GLsizei * rest, std::tuple<structured_buffer<Tm>, structured_buffer<T>...> &t, std::index_sequence<Is...>) {
-        *rest = (GLsizei)sizeof(typename std::tuple_element<0, std::tuple<T...>>::type); return std::make_tuple(std::get<Is + 1>(t)...);
-    }
-
-    template <class... T>
-    constexpr decltype(auto) get_stride_reduce(GLsizei * rest, std::tuple<structured_buffer<T>...> &t) {
-        return get_stride_reduce_impl(rest, t, std::make_index_sequence<(sizeof...(T)) - 1>{});
-    }
-
-    // getting strides of buffer types
-    template <class T>
-    constexpr decltype(auto) get_stride_impl(GLsizei * ptr, std::tuple<structured_buffer<T>> &t) {
-        *ptr = sizeof(typename std::tuple_element<0, std::tuple<T>>::type);
-    }
-
-    template <class... T>
-    constexpr decltype(auto) get_stride_impl(GLsizei * ptr, std::tuple<structured_buffer<T>...> &t) {
-        decltype(auto) rest_tuple = get_globj_reduce<T...>(ptr, t);
-        get_stride_impl(ptr + 1, rest_tuple);
-    }
-
-    template <class... T>
-    constexpr decltype(auto) get_stride(GLsizei * ptr, std::tuple<structured_buffer<T>...> &t) {
-        return get_stride_impl(ptr, t);
-    }
-
-
-
-
     // bindables
     namespace buffer_target {
         _buffer_context element_array(GL_ELEMENT_ARRAY_BUFFER);
