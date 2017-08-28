@@ -67,16 +67,16 @@ int main() {
     }
 
     // multiply creation
-    std::vector<dgl::buffer> vboarray = dgl::buffer::create(2);
-    std::tuple<dgl::buffer, dgl::buffer> &tpl = dgl::buffer::create<void, void>();
+    std::vector<dgl::structured_buffer<glm::vec3>> vboarray = dgl::structured_buffer<glm::vec3>::create(2);
+    std::tuple<dgl::structured_buffer<int>, dgl::buffer> &tpl = dgl::buffer::create_tuple<int, void>();
 
     std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
 
     // create vertices and buffer
     //dgl::structured_buffer<glm::vec3> vbo;
 
-    vboarray[0].storage(sizeof(glm::vec3) * 9);
-    vboarray[0].subdata<glm::vec3>(0, {{
+    vboarray[0].storage(3);
+    vboarray[0].subdata(0, {{
         {-0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   

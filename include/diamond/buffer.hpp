@@ -23,11 +23,11 @@ namespace dgl {
         ~void_buffer<T>() {glDeleteBuffers(1, thisref);}
         
         // new multi-bind creator
-        static std::vector<void_buffer<T>> create(size_t n = 1) {
+        static std::vector<void_buffer<T>> create(GLint n) {
             GLuint * objects = new GLuint[n];
-            std::vector<buffer> buffers;
+            std::vector<void_buffer<T>> buffers;
             for (intptr_t pt = 0; pt < n; pt++) {
-                buffers.push_back(buffer(objects + pt));
+                buffers.push_back(void_buffer<T>(objects + pt));
             }
             glCreateBuffers(n, objects);
             return buffers;
@@ -50,7 +50,7 @@ namespace dgl {
         }
 
         template<typename... T>
-        static std::tuple<void_buffer<T>...>&& create() {
+        static std::tuple<void_buffer<T>...>&& create_tuple() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
@@ -108,15 +108,51 @@ namespace dgl {
         }
     };
 
-    // buffer is void_buffer<void>;
-    using buffer = void_buffer<void>;
-
-
-
-
     template<class T>
-    class structured_buffer: public buffer {
+    class structured_buffer: public void_buffer<T> {
+    protected:
+        using buffer = void_buffer<T>;
+
     public:
+        structured_buffer<T>(GLuint * allocationPointer) : void_buffer<T>(allocationPointer) {};
+        structured_buffer<T>() : void_buffer<T>() {};
+
+        // new multi-bind creator
+        
+        static std::vector<structured_buffer<T>> create(GLint n) {
+            GLuint * objects = new GLuint[n];
+            std::vector<structured_buffer<T>> buffers;
+            for (intptr_t pt = 0; pt < n; pt++) {
+                buffers.push_back(structured_buffer<T>(objects + pt));
+            }
+            glCreateBuffers(n, objects);
+            return buffers;
+        }
+
+        // create tuple of buffers (only voids support)
+        template<typename... T, size_t... Is>
+        static std::tuple<structured_buffer<T>...>&& _make_tuple(GLuint * a, std::index_sequence<Is...>)
+        {
+            return std::make_tuple(structured_buffer<T>(&a[Is])...);
+        }
+
+        template<typename... T>
+        static std::tuple<structured_buffer<T>...>&& _make_tuple(GLuint * a)
+        {
+            return _make_tuple<T...>(a, std::index_sequence_for<T...>{});
+        }
+
+        template<typename... T>
+        static std::tuple<structured_buffer<T>...>&& create_tuple() {
+            constexpr size_t n = sizeof...(T);
+            GLuint * objects = new GLuint[n];
+            glCreateBuffers(n, objects);
+            return _make_tuple<T...>(objects);
+        }
+
+
+
+
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             buffer::get_subdata(offset, size * sizeof(T), data);
         }
@@ -129,7 +165,7 @@ namespace dgl {
             buffer::subdata(offset, size * sizeof(T), data);
         }
 
-        void storage(GLsizei size, const void *data, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
+        void storage(GLsizei size, const void *data = nullptr, GLbitfield flags = GL_DYNAMIC_STORAGE_BIT){
             buffer::storage(size * sizeof(T), data, flags);
         }
 
@@ -156,6 +192,11 @@ namespace dgl {
     };
 
 
+    // buffer is structured_buffer<void>;
+    using buffer = structured_buffer<void>;
+
+
+
     class _buffer_context;
 
     // register buffer binding
@@ -172,10 +213,18 @@ namespace dgl {
         }
 
         ~buffer_binding();
-        void bind(buffer& buf);
-        void bind_range(buffer& buf, GLintptr offset = 0, GLsizei size = 1);
-        void bind(std::vector<buffer>& buf);
-        void bind_range(std::vector<buffer>& buf, GLintptr * offsets = nullptr, GLsizeiptr * sizes = nullptr);
+
+        template<typename T>
+        void bind(structured_buffer<T>& buf);
+
+        template<typename T>
+        void bind_range(structured_buffer<T>& buf, GLintptr offset = 0, GLsizei size = 1);
+
+        template<typename T>
+        void bind(std::vector<structured_buffer<T>>& buf);
+
+        template<typename T>
+        void bind_range(std::vector<structured_buffer<T>>& buf, GLintptr * offsets = nullptr, GLsizeiptr * sizes = nullptr);
     };
 
 
@@ -208,22 +257,25 @@ namespace dgl {
 
 
     // basic bind support
-    void buffer_binding::bind(buffer& buf) {
+    template<typename T>
+    void buffer_binding::bind(structured_buffer<T>& buf) {
         glBindBufferBase(*gltarget, thisref, buf);
     }
 
-    void buffer_binding::bind_range(buffer& buf, GLintptr offset, GLsizei size) {
+    template<typename T>
+    void buffer_binding::bind_range(structured_buffer<T>& buf, GLintptr offset, GLsizei size) {
         glBindBufferRange(*gltarget, thisref, buf, offset, size);
     }
 
-
     // multi-bind support
-    void buffer_binding::bind(std::vector<buffer>& buf) {
+    template<typename T>
+    void buffer_binding::bind(std::vector<structured_buffer<T>>& buf) {
         GLuint handler = buf[0];
         glBindBuffersBase(*gltarget, thisref, buf.size(), /*buf.data()*/ &handler);
     }
 
-    void buffer_binding::bind_range(std::vector<buffer>& buf, GLintptr * offsets, GLsizeiptr * sizes) {
+    template<typename T>
+    void buffer_binding::bind_range(std::vector<structured_buffer<T>>& buf, GLintptr * offsets, GLsizeiptr * sizes) {
         GLuint handler = buf[0];
         glBindBuffersRange(*gltarget, thisref, buf.size(), &handler, offsets, sizes);
     }
