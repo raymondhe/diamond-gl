@@ -19,9 +19,7 @@ namespace dgl {
     public:
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
-
-        // don't know why, but all linked objects removes its
-        //~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); }
+        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
@@ -69,7 +67,8 @@ namespace dgl {
         template<typename... T, size_t... Is>
         static decltype(auto) _make_tuple(GLuint * a, std::index_sequence<Is...>)
         {
-            return std::make_tuple(structured_buffer<T>(a + Is)...);
+            //return std::make_tuple(structured_buffer<T>(a + Is)...); // need construct with `new`, because C++ removes classes outside of this scope
+            return std::make_tuple(*(new structured_buffer<T>(a + Is))...);
         }
 
         template<typename... T>
