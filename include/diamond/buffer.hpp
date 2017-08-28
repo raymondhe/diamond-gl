@@ -60,6 +60,16 @@ namespace dgl {
             return std::make_tuple(*(new structured_buffer<T>(a + Is))...);
         }
 
+
+        // create tuple of pointers of buffers
+        template<typename... T, size_t... Is>
+        static decltype(auto) _make_tuple_ptr(GLuint * a, std::index_sequence<Is...>)
+        {
+            //return std::make_tuple(structured_buffer<T>(a + Is)...); // need construct with `new`, because C++ removes classes outside of this scope
+            return std::make_tuple(new structured_buffer<T>(a + Is)...);
+        }
+
+
     public:
         
         template<class S>
@@ -68,7 +78,7 @@ namespace dgl {
         }
         structured_buffer<T>() : void_buffer<T>() {};
 
-        // new multi-bind creator
+        // vector of buffers creator
         static decltype(auto) create(GLint n) {
             GLuint * objects = new GLuint[n];
             std::vector<structured_buffer<T>> buffers;
@@ -79,12 +89,22 @@ namespace dgl {
             return buffers;
         }
 
+        // for reference type
         template<typename... T>
         static decltype(auto) create() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
             return _make_tuple<T...>(objects, std::index_sequence_for<T...>{});
+        }
+
+        // for pointers type
+        template<typename... T>
+        static decltype(auto) create_ptr() {
+            constexpr size_t n = sizeof...(T);
+            GLuint * objects = new GLuint[n];
+            glCreateBuffers(n, objects);
+            return _make_tuple_ptr<T...>(objects, std::index_sequence_for<T...>{});
         }
 
 
