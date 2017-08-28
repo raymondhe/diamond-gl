@@ -130,13 +130,13 @@ int main() {
         dgl::managment.bind_vertex_array(vao);
 
         // states
-        dgl::options::blend.enable();
+        dgl::option.enable(dgl::options::blend);
         dgl::clear.color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         dgl::clear.depth(1.f);
-        dgl::clear.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
         // commands
-        dgl::draw_mode::triangles.arrays(0, 3);
+        dgl::commands.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        dgl::commands.draw_arrays(dgl::draw_mode::triangles, 0, 3);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

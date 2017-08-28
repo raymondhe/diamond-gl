@@ -47,16 +47,7 @@ namespace dgl {
         void depth(float depth) {
             glClearDepth(depth);
         }
-
-        void clear(GLbitfield cbits) {
-            glClear(cbits);
-        }
     };
-
-    // initialize these classes
-    _blend blend;
-    _clear clear;
-
 
     class _feature: public base {
     public:
@@ -74,6 +65,17 @@ namespace dgl {
         }
     };
 
+    class _feature_control {
+    public:
+        void enable(_feature& feature) {
+            feature.enable();
+        }
+
+        void disable(_feature& feature) {
+            feature.disable();
+        }
+    };
+
 
     namespace options {
         _feature conservative_rasterization_nv(GL_CONSERVATIVE_RASTERIZATION_NV);
@@ -81,6 +83,13 @@ namespace dgl {
         _feature depth_test(GL_DEPTH_TEST);
         _feature texture_2d(GL_TEXTURE_2D);
     };
+
+
+
+    // initialize these classes
+    _blend blend;
+    _clear clear;
+    _feature_control option;
 
     
 }

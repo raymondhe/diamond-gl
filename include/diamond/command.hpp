@@ -68,4 +68,43 @@ namespace dgl {
 
     _dispatch dispatch;
 
+
+
+
+    class _commands {
+    public:
+        void draw_arrays(_mode& mode, GLint first, GLsizei count = 1, GLsizei primcount = 1) {
+            mode.arrays(first, count, primcount);
+        }
+
+        void draw_elements(_mode& mode, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, const GLvoid * indices = nullptr, GLsizei primcount = 1) {
+            mode.elements(count, type, indices, primcount);
+        }
+
+        void draw_elements_base_vertex(_mode& mode, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, GLvoid *indices = nullptr, GLint basevertex = 0) {
+            mode.elements_base_vertex(count, type, indices, basevertex);
+        }
+
+        void draw_elements_range(_mode& mode, glm::ivec2 range, GLsizei count = 1, GLenum type = GL_UNSIGNED_INT, const GLvoid * indices = nullptr, GLsizei primcount = 1) {
+            mode.elements_range(range, count, type, indices, primcount);
+        }
+
+        void draw_arrays_indirect(_mode& mode, const void *indirect = 0) {
+            mode.arrays_indirect(indirect);
+        }
+
+        void draw_elements_indirect(_mode& mode, GLenum type = GL_UNSIGNED_INT, const void *indirect = 0) {
+            mode.elements_indirect(type, indirect);
+        }
+
+        // planned support of new clear bitfield
+        void clear(attrib_bits cbits) {
+            glClear(cbits.bitfield);
+        }
+    };
+
+
+    _commands commands;
+
+
 }

@@ -113,6 +113,43 @@ namespace dgl {
 
 
 
+    struct attrib_bits {
+        union {
+            struct {
+                GLbitfield current : 1;
+                GLbitfield point : 1;
+                GLbitfield line : 1;
+                GLbitfield polygon : 1;
+                GLbitfield polygon_stipple : 1;
+                GLbitfield pixel_mode : 1;
+                GLbitfield lighting : 1;
+                GLbitfield fog : 1;
+                GLbitfield depth_buffer : 1;
+                GLbitfield accum_buffer : 1;
+                GLbitfield stencil_buffer : 1;
+                GLbitfield viewport : 1;
+                GLbitfield transform : 1;
+                GLbitfield enable : 1;
+                GLbitfield color_buffer : 1;
+                GLbitfield hint : 1;
+                GLbitfield eval : 1;
+                GLbitfield list : 1;
+                GLbitfield texture : 1;
+                GLbitfield scissor : 1;
+                GLbitfield multisample : 1;
+            };
+            GLbitfield bitfield = 0;
+        };
+
+        attrib_bits() {
+
+        }
+
+        attrib_bits(GLbitfield bitfield) {
+            this->bitfield = bitfield;
+        }
+    };
+
 
     struct program_stage_bits {
         union {
