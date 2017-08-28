@@ -70,7 +70,6 @@ int main() {
     std::vector<dgl::buffer> vboarray = dgl::buffer::create(2);
     std::vector<dgl::texture> txarray = dgl::texture::create(dgl::texture_target::sampler_2d, 3);
 
-
     // create vertices and buffer
     //dgl::structured_buffer<glm::vec3> vbo;
 

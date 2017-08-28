@@ -8,17 +8,18 @@ namespace dgl {
     template<class T>
     class structured_buffer;
 
-    class buffer: public base {
+    template<class T>
+    class void_buffer: public base {
     protected:
-        buffer(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
+        void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
 
     public:
         
-        buffer() { base::allocate(1); glCreateBuffers(1, thisref); }
-        ~buffer() {glDeleteBuffers(1, thisref);}
+        void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
+        ~void_buffer<T>() {glDeleteBuffers(1, thisref);}
         
         // new multi-bind creator
-        static std::vector<buffer> create(size_t n = 1) {
+        static std::vector<void_buffer<T>> create(size_t n = 1) {
             GLuint * objects = new GLuint[n];
             std::vector<buffer> buffers;
             for (intptr_t pt = 0; pt < n;pt++) {
@@ -28,7 +29,6 @@ namespace dgl {
             return buffers;
             //return std::forward<std::vector<buffer>>(buffers);
         }
-
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
@@ -46,7 +46,7 @@ namespace dgl {
             glNamedBufferStorage(thisref, size, data, flags.bitfield);
         }
 
-        void copydata(buffer& dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){
+        void copydata(void_buffer<T>& dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){
             glCopyNamedBufferSubData(thisref, *dest, readOffset, writeOffset, size);
         }
 
@@ -79,6 +79,8 @@ namespace dgl {
         }
     };
 
+    // buffer is void_buffer<void>;
+    using buffer = void_buffer<void>;
 
 
 
