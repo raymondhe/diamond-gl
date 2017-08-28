@@ -71,6 +71,10 @@ int main() {
 
     // create buffer
     dgl::buffer vbo;
+    std::tuple<dgl::buffer> bufs = dgl::buffer::create<GLubyte>();
+    //auto[vbo] = bufs;
+
+    //dgl::buffer vbo;
     vbo.storage(3 * sizeof(glm::vec3));
     vbo.subdata<glm::vec3>(0, {{
         { -0.5f, -0.5f, 0.0f }, // left  
@@ -78,16 +82,11 @@ int main() {
         { 0.0f,  0.5f, 0.0f }  // top   
     }});
 
-    // create tuple of buffers (ideal for multi-bind)
-    //std::tuple<dgl::buffer, dgl::buffer>& tpl = dgl::buffer::create<GLubyte, GLubyte>();
-
-    // destructive creation of buffers
-    auto [buffer1, buffer2] = dgl::buffer::create<GLubyte, GLubyte>();
-
     // create VAO
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding(0);
+    //binding.vertex_buffer(tpl, new GLintptr[1]{0});
     binding.vertex_buffer<glm::vec3>(vbo, 0);
 
     auto attribute = vao.create_attribute(0);

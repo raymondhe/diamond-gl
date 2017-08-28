@@ -53,7 +53,7 @@ namespace dgl {
 
         // new multi-bind creator
         
-        static std::vector<structured_buffer<T>> create(GLint n) {
+        static decltype(auto) create(GLint n) {
             GLuint * objects = new GLuint[n];
             std::vector<structured_buffer<T>> buffers;
             for (intptr_t pt = 0; pt < n; pt++) {
@@ -63,25 +63,19 @@ namespace dgl {
             return buffers;
         }
 
-        // create tuple of buffers (only voids support)
+        // create tuple of buffers
         template<typename... T, size_t... Is>
-        static std::tuple<structured_buffer<T>...> _make_tuple(GLuint * a, std::index_sequence<Is...>)
+        static decltype(auto) _make_tuple(GLuint * a, std::index_sequence<Is...>)
         {
             return std::make_tuple(structured_buffer<T>(a + Is)...);
         }
 
         template<typename... T>
-        static std::tuple<structured_buffer<T>...> _make_tuple(GLuint * a)
-        {
-            return _make_tuple<T...>(a, std::index_sequence_for<T...>{});
-        }
-
-        template<typename... T>
-        static std::tuple<structured_buffer<T>...> create() {
+        static decltype(auto) create() {
             constexpr size_t n = sizeof...(T);
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
-            return _make_tuple<T...>(objects);
+            return _make_tuple<T...>(objects, std::index_sequence_for<T...>{});
         }
 
 
@@ -108,19 +102,19 @@ namespace dgl {
 
 
         void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
-            return buffer::data<T>(data, usage);
+            return this->data<T>(data, usage);
         }
 
         void subdata(GLintptr offset, const std::vector<T>& data){
-            return buffer::subdata<T>(offset, data);
+            return this->subdata<T>(offset, data);
         }
 
         std::vector<T>& get_subdata(GLintptr offset, GLsizei size) const {
-            return buffer::get_subdata<T>(offset, size);
+            return this->get_subdata<T>(offset, size);
         }
 
         std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
-            return buffer::get_subdata<T>(offset, vctr);
+            return this->get_subdata<T>(offset, vctr);
         }
 
 
