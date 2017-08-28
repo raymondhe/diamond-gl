@@ -124,7 +124,7 @@ namespace dgl {
         constexpr size_t N = sizeof...(T);
         GLuint * buffers = new GLuint[N];
         GLsizei * strides = new GLsizei[N];
-        get_gl_buf(buffers, buf);
+        get_globj(buffers, buf);
         get_stride<T...>(strides, buf);
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);
     }
