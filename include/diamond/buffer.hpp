@@ -13,53 +13,13 @@ namespace dgl {
 
     template<class T>
     class void_buffer: public base {
+    protected:
         using buffer = void_buffer<T>;
 
-    protected:
-        //void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
-
     public:
-        
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
         ~void_buffer<T>() {glDeleteBuffers(1, thisref);}
-        
-        // new multi-bind creator
-        static std::vector<void_buffer<T>> create(GLint n) {
-            GLuint * objects = new GLuint[n];
-            std::vector<void_buffer<T>> buffers;
-            for (intptr_t pt = 0; pt < n; pt++) {
-                buffers.push_back(void_buffer<T>(objects + pt));
-            }
-            glCreateBuffers(n, objects);
-            return buffers;
-            //return std::forward<std::vector<buffer>>(buffers);
-        }
-
-
-
-        // create tuple of buffers (only voids support)
-        template<typename... T, size_t... Is>
-        static std::tuple<void_buffer<T>...>&& _make_tuple(GLuint * a, std::index_sequence<Is...>)
-        {
-            return std::make_tuple(void_buffer<T>(&a[Is])...);
-        }
-
-        template<typename... T>
-        static std::tuple<void_buffer<T>...>&& _make_tuple(GLuint * a)
-        {
-            return _make_tuple<T...>(a, std::index_sequence_for<T...>{});
-        }
-
-        template<typename... T>
-        static std::tuple<void_buffer<T>...>&& create() {
-            constexpr size_t n = sizeof...(T);
-            GLuint * objects = new GLuint[n];
-            glCreateBuffers(n, objects);
-            return _make_tuple<T...>(objects);
-        }
-
-
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
@@ -79,34 +39,6 @@ namespace dgl {
 
         void copydata(void_buffer<T>& dest, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size){
             glCopyNamedBufferSubData(thisref, *dest, readOffset, writeOffset, size);
-        }
-
-        
-        // data from vector
-        template<class T>
-        void data(const std::vector<T>& data, GLenum usage = GL_STATIC_DRAW){
-            this->data(data.size() * sizeof(T), data.data(), usage);
-        }
-
-        // fill subdata by vector
-        template<class T>
-        void subdata(GLintptr offset, const std::vector<T>& data){
-            this->subdata(offset, data.size() * sizeof(T), data.data());
-        }
-
-        // get subdata by range
-        template<class T>
-        std::vector<T>& get_subdata(GLintptr offset, GLsizei size) const {
-            std::vector<T> vctr(size);
-            this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
-            return vctr;
-        }
-
-        // get subdata by full vector
-        template<class T>
-        std::vector<T>& get_subdata(GLintptr offset, std::vector<T>&vctr) const {
-            this->get_subdata(offset, vctr.size() * sizeof(T), vctr.data());
-            return vctr;
         }
     };
 
