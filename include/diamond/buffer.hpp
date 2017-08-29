@@ -54,7 +54,7 @@ namespace NS_NAME {
 
         // create tuple of buffers
         template<typename... T, size_t... Is>
-        static decltype(auto) _make_tuple(GLuint * a, std::index_sequence<Is...>)
+        constexpr static decltype(auto) _make_tuple(GLuint * a, std::index_sequence<Is...>)
         {
             //return std::make_tuple(structured_buffer<T>(a + Is)...); // need construct with `new`, because C++ removes classes outside of this scope
             return std::make_tuple(*(new structured_buffer<T>(a + Is))...);
