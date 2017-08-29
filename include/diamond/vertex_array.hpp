@@ -66,6 +66,8 @@ namespace NS_NAME {
         }
         ~vertex_array() {
             glDeleteVertexArrays(1, thisref);
+            this->set_value(-1);
+            base::deallocate();
         }
 
         vertex_array_binding&& create_binding(GLuint binding = 0){
@@ -119,10 +121,12 @@ namespace NS_NAME {
 
 
 
+
+
     template<class... T>
     void vertex_array_binding::vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets) {
         constexpr size_t N = sizeof...(T);
-        GLuint * buffers = get_globj_wrap(buf);;
+        GLuint * buffers = get_globj_wrap<structured_buffer<T>...>(_ref_tuple(buf));
         GLsizei * strides = get_stride_wrap<T...>();
         if (!offsets) offsets = new GLintptr[N]{0};
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);

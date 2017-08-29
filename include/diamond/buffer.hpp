@@ -19,7 +19,7 @@ namespace NS_NAME {
     public:
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); }
+        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); base::deallocate(); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
@@ -202,7 +202,6 @@ namespace NS_NAME {
             gltarget = &btarget; 
             this->set_value(binding); 
         }
-
         ~buffer_binding();
 
         template<typename T>
@@ -243,7 +242,8 @@ namespace NS_NAME {
 
     
     buffer_binding:: ~buffer_binding() { // unbind
-        glBindBufferBase(*gltarget, thisref, 0); 
+        glBindBufferBase(*gltarget, thisref, 0);
+        base::deallocate();
     }
 
 

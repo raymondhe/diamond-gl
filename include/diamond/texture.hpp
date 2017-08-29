@@ -18,7 +18,7 @@ namespace NS_NAME {
         texture * gltex;
 
     public:
-        ~texture_level() {};
+        ~texture_level() { this->set_value(-1); base::deallocate(); };
         texture_level(texture& tex, GLuint level = 0);
 
         void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
@@ -63,6 +63,8 @@ namespace NS_NAME {
 
         ~texture(){
             glDeleteTextures(1, thisref);
+            this->set_value(-1); 
+            base::deallocate();
         }
 
 

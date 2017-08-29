@@ -17,6 +17,10 @@ namespace NS_NAME {
             this->set_value(shader);
         }
 
+        ~shader() {
+            glDeleteShader(thisref); this->set_value(-1); base::deallocate();
+        }
+
         template<class T>
         T get_val(GLenum pname, T * params = nullptr) const {
             return *(this->get<T>(pname, params));
@@ -76,6 +80,11 @@ namespace NS_NAME {
 
     public:
 
+        ~uniform() {
+            this->set_value(-1);
+            base::deallocate();
+        }
+
         uniform(GLuint prog, GLuint location = 0) {
             base::allocate(1);
             this->set_value(location);
@@ -108,6 +117,10 @@ namespace NS_NAME {
     class uniform_typed : public uniform {
     public:
         uniform_typed(GLuint prog, GLuint location = 0): uniform(prog, location) {}
+        ~uniform_typed() {
+            this->set_value(-1);
+            base::deallocate();
+        }
 
         void set(T value) {
             uniform::set<T>(value);
@@ -153,9 +166,11 @@ namespace NS_NAME {
             this->set_value(program);
         }
 
-        ~program() { glDeleteProgram(thisref); }
-
-        
+        ~program() { 
+            glDeleteProgram(thisref); 
+            this->set_value(-1); 
+            base::deallocate(); 
+        }
 
         uniform&& get_uniform(GLuint location) const {
             return uniform((GLuint)thisref, location);
@@ -166,8 +181,8 @@ namespace NS_NAME {
         }
 
         template<class T>
-        uniform_typed<T>&& get_uniform(GLuint location) const {
-            return uniform_typed<T>((GLuint)thisref, location);
+        uniform_typed<T>& get_uniform(GLuint location) const {
+            return *(new uniform_typed<T>((GLuint)thisref, location));
         }
 
         template<class T>
@@ -216,7 +231,11 @@ namespace NS_NAME {
              base::allocate(1);
              glCreateProgramPipelines(1, thisref);
          }
-        ~program_pipeline() {glDeleteProgramPipelines(1, thisref);}
+        ~program_pipeline() {
+            glDeleteProgramPipelines(1, thisref);
+            this->set_value(-1);
+            base::deallocate();
+        }
 
         void use_stages(program_stage_bits stages, program& prog){
             glUseProgramStages(thisref, stages.bitfield, prog);
