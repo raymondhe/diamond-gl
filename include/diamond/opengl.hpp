@@ -28,7 +28,7 @@ namespace NS_NAME {
     public:
         base() { allocate(1); }
         ~base() { }
-        void deallocate() { if (allocated && globj) { /*delete globj;*/ } this->globj = nullptr; allocated = false; };
+        void deallocate() { if (allocated && globj) { *globj = -1;/*delete globj;*/ } this->globj = nullptr; allocated = false; };
         void allocate(const size_t cnt) { globj = new GLuint[cnt]; allocated = true; }
         operator const GLuint&() const { return (*globj); }
     };
