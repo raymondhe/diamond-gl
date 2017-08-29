@@ -19,7 +19,7 @@ namespace NS_NAME {
     public:
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::allocate(1); glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_value(-1); base::deallocate(); }
+        ~void_buffer<T>() { glDeleteBuffers(1, thisref); base::deallocate(); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
@@ -231,7 +231,11 @@ namespace NS_NAME {
             this->set_object(std::forward<GLuint>(binding));
         }
 
-        buffer_binding&& create_binding(GLuint binding = 0){
+        buffer_binding&& create_binding(GLuint&& binding = 0){
+            return buffer_binding(thisref, std::forward<GLuint>(binding));
+        }
+
+        buffer_binding&& create_binding(GLuint& binding) {
             return buffer_binding(thisref, binding);
         }
 

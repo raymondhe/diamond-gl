@@ -18,7 +18,7 @@ namespace NS_NAME {
         texture * gltex;
 
     public:
-        ~texture_level() { this->set_value(-1); base::deallocate(); };
+        ~texture_level() { base::deallocate(); };
         texture_level(texture& tex, GLint&& level = 0);
         texture_level(texture& tex, GLint& level);
 
@@ -62,7 +62,6 @@ namespace NS_NAME {
 
         ~texture(){
             glDeleteTextures(1, thisref);
-            this->set_value(-1); 
             base::deallocate();
         }
 

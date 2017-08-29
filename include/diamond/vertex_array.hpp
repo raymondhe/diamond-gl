@@ -99,40 +99,40 @@ namespace NS_NAME {
             base::deallocate();
         }
 
-        vertex_array_binding&& create_binding(GLuint &&binding = 0){
-            return vertex_array_binding(thisref, std::forward<GLuint>(binding));
+        vertex_array_binding& create_binding(GLuint &&binding = 0){
+            return *(new vertex_array_binding(thisref, std::forward<GLuint>(binding)));
         }
 
-        vertex_array_binding&& create_binding(GLuint &binding) {
-            return vertex_array_binding(thisref, binding);
-        }
-
-        template<class T>
-        vertex_array_binding_single<T>&& create_binding(GLuint &&binding = 0) {
-            return vertex_array_binding_single<T>(thisref, std::forward<GLuint>(binding));
-        }
-
-        template<class... T>
-        vertex_array_binding_multi<T...>&& create_binding(GLuint &&binding = 0) {
-            return vertex_array_binding_multi<T...>(thisref, std::forward<GLuint>(binding));
+        vertex_array_binding& create_binding(GLuint &binding) {
+            return *(new vertex_array_binding(thisref, binding));
         }
 
         template<class T>
-        vertex_array_binding_single<T>&& create_binding(GLuint &binding) {
-            return vertex_array_binding_single<T>(thisref, binding);
+        vertex_array_binding_single<T>& create_binding(GLuint &&binding = 0) {
+            return *(new vertex_array_binding_single<T>(thisref, std::forward<GLuint>(binding)));
         }
 
         template<class... T>
-        vertex_array_binding_multi<T...>&& create_binding(GLuint &binding) {
-            return vertex_array_binding_multi<T...>(thisref, binding);
+        vertex_array_binding_multi<T...>& create_binding(GLuint &&binding = 0) {
+            return *(new vertex_array_binding_multi<T...>(thisref, std::forward<GLuint>(binding)));
         }
 
-        vertex_array_attribute&& create_attribute(GLuint &&attribute = 0){
-            return vertex_array_attribute(thisref, std::forward<GLuint>(attribute));
+        template<class T>
+        vertex_array_binding_single<T>& create_binding(GLuint &binding) {
+            return *(new vertex_array_binding_single<T>(thisref, binding));
         }
 
-        vertex_array_attribute&& create_attribute(GLuint &attribute) {
-            return vertex_array_attribute(thisref, attribute);
+        template<class... T>
+        vertex_array_binding_multi<T...>& create_binding(GLuint &binding) {
+            return *(new vertex_array_binding_multi<T...>(thisref, binding));
+        }
+
+        vertex_array_attribute& create_attribute(GLuint &&attribute = 0){
+            return *(new vertex_array_attribute(thisref, std::forward<GLuint>(attribute)));
+        }
+
+        vertex_array_attribute& create_attribute(GLuint &attribute) {
+            return *(new vertex_array_attribute(thisref, attribute));
         }
 
         void element_buffer(buffer& buf){

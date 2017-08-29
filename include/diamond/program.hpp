@@ -16,7 +16,7 @@ namespace NS_NAME {
         }
 
         ~shader() {
-            glDeleteShader(thisref); this->set_value(-1); base::deallocate();
+            glDeleteShader(thisref); base::deallocate();
         }
 
         template<class T>
@@ -79,7 +79,6 @@ namespace NS_NAME {
     public:
 
         ~uniform() {
-            this->set_value(-1);
             base::deallocate();
         }
 
@@ -121,7 +120,6 @@ namespace NS_NAME {
         uniform_typed(GLuint prog, GLuint&& location = 0): uniform(prog, std::forward<GLuint>(location)) {}
         uniform_typed(GLuint prog, GLuint& location) : uniform(prog, location) {}
         ~uniform_typed() {
-            this->set_value(-1);
             base::deallocate();
         }
 
@@ -168,8 +166,7 @@ namespace NS_NAME {
         }
 
         ~program() { 
-            glDeleteProgram(thisref); 
-            this->set_value(-1); 
+            glDeleteProgram(thisref);
             base::deallocate(); 
         }
 
