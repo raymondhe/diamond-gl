@@ -36,9 +36,32 @@ namespace NS_NAME {
         template<class... T>
         void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets = nullptr);
     };
+    
+    template<class... T>
+    class vertex_array_binding_multi : public vertex_array_binding {
+    public:
+        vertex_array_binding_multi<T...>(vertex_array& vao, GLuint binding = 0) : vertex_array_binding(vao, binding) {};
 
+        void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets = nullptr) {
+            vertex_array_binding::vertex_buffer<T...>(buf, offsets);
+        };
+    };
 
+    template<class T>
+    class vertex_array_binding_single : public vertex_array_binding {
+    public:
+        vertex_array_binding_single<T>(vertex_array& vao, GLuint binding = 0) : vertex_array_binding(vao, binding) {};
 
+        void vertex_buffer(buffer& buf, GLintptr offset = 0) {
+            vertex_array_binding::vertex_buffer<T>(buf, offset);
+        };
+        void vertex_buffer(structured_buffer<T>& buf, GLintptr offset = 0) {
+            vertex_array_binding::vertex_buffer<T>(buf, offset);
+        };
+        void vertex_buffer(std::tuple<structured_buffer<T>>& buf, const GLintptr * offsets = nullptr) {
+            vertex_array_binding::vertex_buffer<T>(buf, offsets);
+        };
+    };
 
     class vertex_array_attribute: public base {
     protected:
@@ -72,6 +95,16 @@ namespace NS_NAME {
 
         vertex_array_binding&& create_binding(GLuint binding = 0){
             return vertex_array_binding(thisref, binding);
+        }
+
+        template<class T>
+        vertex_array_binding_single<T>&& create_binding(GLuint binding = 0) {
+            return vertex_array_binding_single<T>(thisref, binding);
+        }
+
+        template<class... T>
+        vertex_array_binding_multi<T...>&& create_binding(GLuint binding = 0) {
+            return vertex_array_binding_multi<T...>(thisref, binding);
         }
 
         vertex_array_attribute&& create_attribute(GLuint attribute = 0){

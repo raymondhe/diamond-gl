@@ -85,7 +85,7 @@ int main() {
     // create VAO
     dgl::vertex_array vao;
 
-    auto binding = vao.create_binding(0);
+    auto binding = vao.create_binding<glm::vec3, glm::vec2>(0);
     binding.vertex_buffer(bufs);
     //binding.vertex_buffer<glm::vec3>(vbo, 0);
 
