@@ -19,7 +19,8 @@ namespace NS_NAME {
 
     public:
         ~texture_level() { this->set_value(-1); base::deallocate(); };
-        texture_level(texture& tex, GLuint level = 0);
+        texture_level(texture& tex, GLint&& level = 0);
+        texture_level(texture& tex, GLint& level);
 
         void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
         void subimage(glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels);
@@ -56,9 +57,7 @@ namespace NS_NAME {
         };
 
     public:
-        texture() {
-            base::allocate(1);
-        }
+        texture() {}
         texture(_texture_context &gltarget);
 
         ~texture(){
@@ -73,8 +72,12 @@ namespace NS_NAME {
 
 
 
-        texture_level get_level(GLint level = 0) {
-            return texture_level(thisref, level);
+        texture_level& get_level(GLint&& level = 0) {
+            return *(new texture_level(thisref, std::forward<GLint>(level)));
+        }
+
+        texture_level& get_level(GLint& level) {
+            return *(new texture_level(thisref, level));
         }
 
 
@@ -200,10 +203,14 @@ namespace NS_NAME {
     };
 
 
-    texture_level::texture_level(texture& tex, GLuint level) {
-        base::allocate(1);
+    texture_level::texture_level(texture& tex, GLint& level) {
         gltex = &tex;
-        this->set_value(level);
+        this->set_object(level);
+    }
+
+    texture_level::texture_level(texture& tex, GLint&& level) {
+        gltex = &tex;
+        this->set_object(std::forward<GLint>(level));
     }
 
     void texture_level::subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels) {
@@ -348,9 +355,11 @@ namespace NS_NAME {
     // image binding
     class image: public base {
     public:
-        image(GLuint binding = 0) {
-            base::allocate(1);
-            this->set_value(binding);
+        image(GLuint&& binding = 0) {
+            this->set_object(std::forward<GLuint>(binding));
+        }
+        image(GLuint& binding) {
+            this->set_object(binding);
         }
 
         // bind image texture
@@ -363,9 +372,11 @@ namespace NS_NAME {
     // contexted texture binding
     class _texture_context: public base {
     public:
-        _texture_context(GLuint binding = 0) {
-            base::allocate(1);
-            this->set_value(binding);
+        _texture_context(GLuint &binding) {
+            this->set_object(binding);
+        }
+        _texture_context(GLuint &&binding = 0) {
+            this->set_object(std::forward<GLuint>(binding));
         }
 
         // create multiply texture
@@ -385,9 +396,9 @@ namespace NS_NAME {
     };
 
     texture::texture(_texture_context &gltarget) {
+        this->gltarget = &gltarget;
         base::allocate(1);
-        this->gltarget = &gltarget;//std::make_shared<_texture_context>(gltarget);
-        glCreateTextures((GLenum)gltarget, 1, thisref);
+        glCreateTextures(gltarget, 1, (GLuint *)thisref);
     };
 
     void texture::copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {

@@ -15,10 +15,14 @@ namespace NS_NAME {
         vertex_array * glvao;
 
     public:
-        vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
-            base::allocate(1);
+        vertex_array_binding(vertex_array& vao, GLuint&& binding = 0) {
             glvao = &vao;
-            this->set_value(binding);
+            this->set_object(std::forward<GLuint>(binding));
+        }
+
+        vertex_array_binding(vertex_array& vao, GLuint& binding) {
+            glvao = &vao;
+            this->set_object(binding);
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0, GLintptr stride = 0);
@@ -40,7 +44,8 @@ namespace NS_NAME {
     template<class... T>
     class vertex_array_binding_multi : public vertex_array_binding {
     public:
-        vertex_array_binding_multi<T...>(vertex_array& vao, GLuint binding = 0) : vertex_array_binding(vao, binding) {};
+        vertex_array_binding_multi<T...>(vertex_array& vao, GLuint&& binding = 0) : vertex_array_binding(vao, std::forward<GLuint>(binding)) {};
+        vertex_array_binding_multi<T...>(vertex_array& vao, GLuint& binding) : vertex_array_binding(vao, binding) {};
 
         void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets = nullptr) {
             vertex_array_binding::vertex_buffer<T...>(buf, offsets);
@@ -50,7 +55,8 @@ namespace NS_NAME {
     template<class T>
     class vertex_array_binding_single : public vertex_array_binding {
     public:
-        vertex_array_binding_single<T>(vertex_array& vao, GLuint binding = 0) : vertex_array_binding(vao, binding) {};
+        vertex_array_binding_single<T>(vertex_array& vao, GLuint&& binding = 0) : vertex_array_binding(vao, std::forward<GLuint>(binding)) {};
+        vertex_array_binding_single<T>(vertex_array& vao, GLuint& binding) : vertex_array_binding(vao, binding) {};
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0) {
             vertex_array_binding::vertex_buffer<T>(buf, offset);
@@ -70,7 +76,8 @@ namespace NS_NAME {
 
     public:
         ~vertex_array_attribute();
-        vertex_array_attribute(vertex_array& vao, GLuint binding = 0);
+        vertex_array_attribute(vertex_array& vao, GLuint&& binding = 0);
+        vertex_array_attribute(vertex_array& vao, GLuint& binding);
         void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0);
         void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0);
         void attrib_format_long(GLint size, GLenum type, GLuint relativeoffset = 0);
@@ -89,25 +96,42 @@ namespace NS_NAME {
         }
         ~vertex_array() {
             glDeleteVertexArrays(1, thisref);
-            this->set_value(-1);
             base::deallocate();
         }
 
-        vertex_array_binding&& create_binding(GLuint binding = 0){
+        vertex_array_binding&& create_binding(GLuint &&binding = 0){
+            return vertex_array_binding(thisref, std::forward<GLuint>(binding));
+        }
+
+        vertex_array_binding&& create_binding(GLuint &binding) {
             return vertex_array_binding(thisref, binding);
         }
 
         template<class T>
-        vertex_array_binding_single<T>&& create_binding(GLuint binding = 0) {
+        vertex_array_binding_single<T>&& create_binding(GLuint &&binding = 0) {
+            return vertex_array_binding_single<T>(thisref, std::forward<GLuint>(binding));
+        }
+
+        template<class... T>
+        vertex_array_binding_multi<T...>&& create_binding(GLuint &&binding = 0) {
+            return vertex_array_binding_multi<T...>(thisref, std::forward<GLuint>(binding));
+        }
+
+        template<class T>
+        vertex_array_binding_single<T>&& create_binding(GLuint &binding) {
             return vertex_array_binding_single<T>(thisref, binding);
         }
 
         template<class... T>
-        vertex_array_binding_multi<T...>&& create_binding(GLuint binding = 0) {
+        vertex_array_binding_multi<T...>&& create_binding(GLuint &binding) {
             return vertex_array_binding_multi<T...>(thisref, binding);
         }
 
-        vertex_array_attribute&& create_attribute(GLuint attribute = 0){
+        vertex_array_attribute&& create_attribute(GLuint &&attribute = 0){
+            return vertex_array_attribute(thisref, std::forward<GLuint>(attribute));
+        }
+
+        vertex_array_attribute&& create_attribute(GLuint &attribute) {
             return vertex_array_attribute(thisref, attribute);
         }
 
@@ -165,11 +189,15 @@ namespace NS_NAME {
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);
     }
 
-    vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
-        //glvao = std::make_shared<vertex_array>(vao);
-        base::allocate(1);
+    vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint& binding) {
         glvao = &vao;
-        this->set_value(binding);
+        this->set_object(binding);
+        glEnableVertexArrayAttrib(*glvao, thisref);
+    }
+
+    vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint&& binding) {
+        glvao = &vao;
+        this->set_object(std::forward<GLuint>(binding));
         glEnableVertexArrayAttrib(*glvao, thisref);
     }
 

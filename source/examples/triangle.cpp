@@ -105,7 +105,7 @@ int main() {
 
 
     // create texture
-    dgl::texture texture(dgl::texture_target::texture2d);
+    dgl::texture texture = dgl::texture(dgl::texture_target::texture2d);
     texture.storage(1, GL_RGBA32F, glm::uvec2(1, 1)); // 2d texture
     texture.parameter_val<int>(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     texture.parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);

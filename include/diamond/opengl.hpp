@@ -20,6 +20,8 @@ namespace NS_NAME {
     protected:
         bool allocated = false;
         GLuint * globj = nullptr;
+        void set_object(GLint &&obj) { allocate(1); *globj = obj; }
+        void set_object(GLint &obj) { deallocate(); globj = (GLuint*)&obj; }
         void set_object(GLuint &&obj) { allocate(1); *globj = obj; }
         void set_object(GLuint &obj) { deallocate(); globj = &obj; }
         void set_object(GLuint *obj) { deallocate(); globj = obj; }
@@ -29,7 +31,7 @@ namespace NS_NAME {
         base() { allocate(1); }
         ~base() { }
         void deallocate() { if (allocated && globj) { *globj = -1;/*delete globj;*/ } this->globj = nullptr; allocated = false; };
-        void allocate(const size_t cnt) { globj = new GLuint[cnt]; allocated = true; }
+        void allocate(const size_t cnt) { if (!globj) globj = new GLuint[cnt]; allocated = true; }
         operator const GLuint&() const { return (*globj); }
     };
 

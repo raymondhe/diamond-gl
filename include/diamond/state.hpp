@@ -51,9 +51,11 @@ namespace NS_NAME {
 
     class _feature: public base {
     public:
-        _feature(GLuint feature = 0) {
-            base::allocate(1);
-            this->set_value(feature);
+        _feature(GLuint &feature) {
+            this->set_object(feature);
+        }
+        _feature(GLuint &&feature) {
+            this->set_object(std::forward<GLuint>(feature));
         }
 
         void enable() {

@@ -83,8 +83,13 @@ namespace NS_NAME {
             base::deallocate();
         }
 
-        uniform(GLuint prog, GLuint location = 0) {
-            this->set_object(&location);
+        uniform(GLuint prog, GLuint &&location = 0) {
+            this->set_object(std::forward<GLuint>(location));
+            program = prog;
+        }
+
+        uniform(GLuint prog, GLuint &location) {
+            this->set_object(location);
             program = prog;
         }
 
@@ -113,7 +118,8 @@ namespace NS_NAME {
     template<class T>
     class uniform_typed : public uniform {
     public:
-        uniform_typed(GLuint prog, GLuint location = 0): uniform(prog, location) {}
+        uniform_typed(GLuint prog, GLuint&& location = 0): uniform(prog, std::forward<GLuint>(location)) {}
+        uniform_typed(GLuint prog, GLuint& location) : uniform(prog, location) {}
         ~uniform_typed() {
             this->set_value(-1);
             base::deallocate();
@@ -167,8 +173,12 @@ namespace NS_NAME {
             base::deallocate(); 
         }
 
-        uniform&& get_uniform(GLuint location) const {
-            return uniform((GLuint)thisref, location);
+        uniform&& get_uniform(GLuint &location) const {
+            return uniform(thisref, location);
+        }
+
+        uniform&& get_uniform(GLuint &&location) const {
+            return uniform(thisref, std::forward<GLuint>(location));
         }
 
         uniform&& get_uniform(std::string name) const {
@@ -228,7 +238,6 @@ namespace NS_NAME {
          }
         ~program_pipeline() {
             glDeleteProgramPipelines(1, thisref);
-            this->set_value(-1);
             base::deallocate();
         }
 

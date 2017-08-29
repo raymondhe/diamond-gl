@@ -197,10 +197,13 @@ namespace NS_NAME {
         _buffer_context * gltarget;
 
     public:
-        buffer_binding(_buffer_context& btarget, GLuint binding = 0) {
-            base::allocate(1);
+        buffer_binding(_buffer_context& btarget, GLuint&& binding = 0) {
             gltarget = &btarget; 
-            this->set_value(binding); 
+            this->set_object(std::forward<GLuint>(binding));
+        }
+        buffer_binding(_buffer_context& btarget, GLuint& binding) {
+            gltarget = &btarget;
+            this->set_object(binding);
         }
         ~buffer_binding();
 
@@ -221,9 +224,11 @@ namespace NS_NAME {
     // contextual targeted bindings
     class _buffer_context: public base {
     public:
-        _buffer_context(GLuint binding = 0) {
-            base::allocate(1);
-            this->set_value(binding);
+        _buffer_context(GLuint& binding) {
+            this->set_object(binding);
+        }
+        _buffer_context(GLuint&& binding = 0) {
+            this->set_object(std::forward<GLuint>(binding));
         }
 
         buffer_binding&& create_binding(GLuint binding = 0){
