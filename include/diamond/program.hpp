@@ -12,9 +12,7 @@ namespace NS_NAME {
     class shader: public base {
     public:
         shader(GLenum shaderType) {
-            base::allocate(1);
-            GLuint shader = glCreateShader(shaderType);
-            this->set_value(shader);
+            this->set_object(glCreateShader(shaderType));
         }
 
         ~shader() {
@@ -86,8 +84,7 @@ namespace NS_NAME {
         }
 
         uniform(GLuint prog, GLuint location = 0) {
-            base::allocate(1);
-            this->set_value(location);
+            this->set_object(&location);
             program = prog;
         }
 
@@ -146,9 +143,7 @@ namespace NS_NAME {
     class program: public base {
     public:
         program() {
-            base::allocate(1);
-            GLuint program = glCreateProgram();
-            this->set_value(program);
+            this->set_object(glCreateProgram());
         }
 
         program(const std::vector<std::string>& shaders, GLenum shaderType){
@@ -156,14 +151,14 @@ namespace NS_NAME {
             for (int i = 0; i < shaders.size(); i++) {
                 parts[i] = shaders[i].c_str();
             }
-            GLuint program = glCreateShaderProgramv(shaderType, shaders.size(), parts);
-            this->set_value(program);
+            GLuint prog = glCreateShaderProgramv(shaderType, shaders.size(), parts);
+            this->set_object(&prog);
         }
 
         program(std::string source, GLenum shaderType){
             const GLchar * src = source.c_str();
-            GLuint program = glCreateShaderProgramv(shaderType, 1, &src);
-            this->set_value(program);
+            GLuint prog = glCreateShaderProgramv(shaderType, 1, &src);
+            this->set_object(&prog);
         }
 
         ~program() { 

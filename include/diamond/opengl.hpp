@@ -20,8 +20,9 @@ namespace NS_NAME {
     protected:
         bool allocated = false;
         GLuint * globj = nullptr;
+        void set_object(GLuint &&obj) { allocate(1); *globj = obj; }
         void set_object(GLuint &obj) { deallocate(); globj = &obj; }
-        void set_object(GLuint *obj) { globj = obj; }
+        void set_object(GLuint *obj) { deallocate(); globj = obj; }
         void set_value(const GLuint& obj) { if (globj) *globj = obj; };
         operator GLuint*() { return globj; }
     public:
