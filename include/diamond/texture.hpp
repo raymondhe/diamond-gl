@@ -107,29 +107,29 @@ namespace NS_NAME {
 
         template<class T>
         void parameter(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameteriv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(float)) glTextureParameterfv(thisref, pname, (float*)params);
+            if constexpr (std::is_same<T, int>::value) glTextureParameteriv(thisref, pname, (int*)params);
+            if constexpr (std::is_same<T, float>::value) glTextureParameterfv(thisref, pname, (float*)params);
         }
 
         template<class T>
         void parameter_int(GLenum pname, T * params) const {
-            if (typeid(T) == typeid(int)) glTextureParameterIiv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(GLuint)) glTextureParameterIuiv(thisref, pname, (GLuint*)params);
+            if constexpr (std::is_same<T, int>::value) glTextureParameterIiv(thisref, pname, (int*)params);
+            if constexpr (std::is_same<T, GLuint>::value) glTextureParameterIuiv(thisref, pname, (GLuint*)params);
         }
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameteriv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(float)) glGetTextureParameterfv(thisref, pname, (float*)params);
+            if constexpr (std::is_same<T, int>::value) glGetTextureParameteriv(thisref, pname, (int*)params);
+            if constexpr (std::is_same<T, float>::value) glGetTextureParameterfv(thisref, pname, (float*)params);
             return params;
         }
 
         template<class T>
         T * get_parameter_int(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetTextureParameterIiv(thisref, pname, (int*)params);
-            if (typeid(T) == typeid(GLuint)) glGetTextureParameterIuiv(thisref, pname, (GLuint*)params);
+            if constexpr (std::is_same<T, int>::value) glGetTextureParameterIiv(thisref, pname, (int*)params);
+            if constexpr (std::is_same<T, GLuint>::value) glGetTextureParameterIuiv(thisref, pname, (GLuint*)params);
             return params;
         }
 
@@ -237,8 +237,8 @@ namespace NS_NAME {
     template<class T>
     T * texture_level::get_parameter(GLenum pname, T * params) const {
         if (!params) params = { 0 };
-        if (typeid(T) == typeid(int)) glGetTextureLevelParameteriv(*gltex, thisref, pname, (int*)params);
-        if (typeid(T) == typeid(float)) glGetTextureLevelParameterfv(*gltex, thisref, pname, (float*)params);
+        if constexpr (std::is_same<T, int>::value) glGetTextureLevelParameteriv(*gltex, thisref, pname, (int*)params);
+        if constexpr (std::is_same<T, float>::value) glGetTextureLevelParameterfv(*gltex, thisref, pname, (float*)params);
         return params;
     }
 
@@ -283,29 +283,29 @@ namespace NS_NAME {
 
         template<class T>
         void parameter(GLenum pname, T * params) {
-            if (typeid(T) == typeid(int)) glSamplerParameteriv(thisref, pname, params);
-            if (typeid(T) == typeid(float)) glSamplerParameterfv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glSamplerParameteriv(thisref, pname, params);
+            if constexpr (std::is_same<T, float>::value) glSamplerParameterfv(thisref, pname, params);
         }
 
         template<class T>
         void parameter_int(GLenum pname, T * params) {
-            if (typeid(T) == typeid(int)) glSamplerParameterIiv(thisref, pname, params);
-            if (typeid(T) == typeid(GLuint)) glSamplerParameterIuiv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glSamplerParameterIiv(thisref, pname, params);
+            if constexpr (std::is_same<T, GLuint>::value) glSamplerParameterIuiv(thisref, pname, params);
         }
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetSamplerParameteriv(thisref, pname, params);
-            if (typeid(T) == typeid(float)) glGetSamplerParameterfv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glGetSamplerParameteriv(thisref, pname, params);
+            if constexpr (std::is_same<T, float>::value) glGetSamplerParameterfv(thisref, pname, params);
             return params;
         }
 
         template<class T>
         T * get_parameter_int(GLenum pname, T * params = nullptr) const {
             if (!params) params = { 0 };
-            if (typeid(T) == typeid(int)) glGetSamplerParameterIiv(thisref, pname, params);
-            if (typeid(T) == typeid(GLuint)) glGetSamplerParameterIuiv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glGetSamplerParameterIiv(thisref, pname, params);
+            if constexpr (std::is_same<T, GLuint>::value) glGetSamplerParameterIuiv(thisref, pname, params);
             return params;
         }
 

@@ -29,7 +29,7 @@ namespace NS_NAME {
         template<class T>
         T * get(GLenum pname, T * params = nullptr) const {
             if (!params) params = new T[1];
-            if (typeid(T) == typeid(int)) glGetShaderiv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glGetShaderiv(thisref, pname, params);
             return params;
         }
 
@@ -94,22 +94,22 @@ namespace NS_NAME {
         // base templates
         template<class T>
         void set(T value){
-            if  (typeid(T) == typeid(int)) glProgramUniform1i(program, thisref, value);
-            if  (typeid(T) == typeid(GLuint)) glProgramUniform1ui(program, thisref, value);
-            if  (typeid(T) == typeid(float)) glProgramUniform1f(program, thisref, value);
-            if  (typeid(T) == typeid(double)) glProgramUniform1d(program, thisref, value);
-            if  (typeid(T) == typeid(int64_t)) glProgramUniform1i64ARB(program, thisref, value);
-            if  (typeid(T) == typeid(uint64_t)) glProgramUniform1ui64ARB(program, thisref, value);
+            if constexpr (std::is_same<T, int>::value) glProgramUniform1i(program, thisref, value);
+            if constexpr (std::is_same<T, GLuint>::value) glProgramUniform1ui(program, thisref, value);
+            if constexpr (std::is_same<T, float>::value) glProgramUniform1f(program, thisref, value);
+            if constexpr (std::is_same<T, double>::value) glProgramUniform1d(program, thisref, value);
+            if constexpr (std::is_same<T, int64_t>::value) glProgramUniform1i64ARB(program, thisref, value);
+            if constexpr (std::is_same<T, uint64_t>::value) glProgramUniform1ui64ARB(program, thisref, value);
         }
 
         template<class T>
         void set(const std::vector<T>& values){
-            if  (typeid(T) == typeid(int)) glProgramUniform1iv(program, thisref, value.size(), value.data());
-            if  (typeid(T) == typeid(GLuint)) glProgramUniform1uiv(program, thisref, value.size(), value.data());
-            if  (typeid(T) == typeid(float)) glProgramUniform1fv(program, thisref, value.size(), value.data());
-            if  (typeid(T) == typeid(double)) glProgramUniform1dv(program, thisref, value.size(), value.data());
-            if  (typeid(T) == typeid(int64_t)) glProgramUniform1iv64ARB(program, thisref, value.size(), value.data());
-            if  (typeid(T) == typeid(uint64_t)) glProgramUniform1uiv64ARB(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, int>::value) glProgramUniform1iv(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, GLuint>::value) glProgramUniform1uiv(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, float>::value) glProgramUniform1fv(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, double>::value) glProgramUniform1dv(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, int64_t>::value) glProgramUniform1iv64ARB(program, thisref, value.size(), value.data());
+            if constexpr (std::is_same<T, uint64_t>::value) glProgramUniform1uiv64ARB(program, thisref, value.size(), value.data());
         }
     };
 
@@ -210,7 +210,7 @@ namespace NS_NAME {
         template<class T>
         T * get(GLenum pname, T * params = nullptr) const {
             if (!params) params = new T[1];
-            if (typeid(T) == typeid(int)) glGetProgramiv(thisref, pname, params);
+            if constexpr (std::is_same<T, int>::value) glGetProgramiv(thisref, pname, params);
             return params;
         }
 
