@@ -16,7 +16,7 @@ namespace NS_NAME {
         }
 
         ~shader() {
-            glDeleteShader(thisref); base::deallocate();
+            glDeleteShader(thisref);
         }
 
         template<class T>
@@ -79,15 +79,9 @@ namespace NS_NAME {
     public:
 
         ~uniform() {
-            base::deallocate();
         }
 
-        uniform(GLuint prog, GLuint &&location = 0) {
-            this->set_object(std::forward<GLuint>(location));
-            program = prog;
-        }
-
-        uniform(GLuint prog, GLuint &location) {
+        uniform(GLuint prog, GLuint location = 0) {
             this->set_object(location);
             program = prog;
         }
@@ -117,11 +111,8 @@ namespace NS_NAME {
     template<class T>
     class uniform_typed : public uniform {
     public:
-        uniform_typed(GLuint prog, GLuint&& location = 0): uniform(prog, std::forward<GLuint>(location)) {}
-        uniform_typed(GLuint prog, GLuint& location) : uniform(prog, location) {}
-        ~uniform_typed() {
-            base::deallocate();
-        }
+        uniform_typed(GLuint prog, GLuint location = 0): uniform(prog, location) {}
+        ~uniform_typed() {}
 
         void set(T value) {
             uniform::set<T>(value);
@@ -155,41 +146,34 @@ namespace NS_NAME {
             for (int i = 0; i < shaders.size(); i++) {
                 parts[i] = shaders[i].c_str();
             }
-            GLuint prog = glCreateShaderProgramv(shaderType, shaders.size(), parts);
-            this->set_object(&prog);
+            this->set_object(glCreateShaderProgramv(shaderType, shaders.size(), parts));
         }
 
         program(std::string source, GLenum shaderType){
             const GLchar * src = source.c_str();
-            GLuint prog = glCreateShaderProgramv(shaderType, 1, &src);
-            this->set_object(&prog);
+            this->set_object(glCreateShaderProgramv(shaderType, 1, &src));
         }
 
         ~program() { 
             glDeleteProgram(thisref);
-            base::deallocate(); 
         }
 
-        uniform&& get_uniform(GLuint &location) const {
-            return uniform(thisref, location);
+        uniform get_uniform(GLuint location) const {
+            return std::move(uniform(thisref, location));
         }
 
-        uniform&& get_uniform(GLuint &&location) const {
-            return uniform(thisref, std::forward<GLuint>(location));
-        }
-
-        uniform&& get_uniform(std::string name) const {
-            return get_uniform(glGetUniformLocation(thisref, name.c_str()));
+        uniform get_uniform(std::string name) const {
+            return std::move(get_uniform(glGetUniformLocation(thisref, name.c_str())));
         }
 
         template<class T>
-        uniform_typed<T>& get_uniform(GLuint location) const {
-            return *(new uniform_typed<T>((GLuint)thisref, location));
+        uniform_typed<T> get_uniform(GLuint location) const {
+            return std::move(uniform_typed<T>((GLuint)thisref, location));
         }
 
         template<class T>
-        uniform_typed<T>&& get_uniform(std::string name) const {
-            return this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str()));
+        uniform_typed<T> get_uniform(std::string name) const {
+            return std::move(this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str())));
         }
 
 
@@ -230,12 +214,10 @@ namespace NS_NAME {
     class program_pipeline: public base {
     public:
          program_pipeline() {
-             base::allocate(1);
              glCreateProgramPipelines(1, thisref);
          }
         ~program_pipeline() {
             glDeleteProgramPipelines(1, thisref);
-            base::deallocate();
         }
 
         void use_stages(program_stage_bits stages, program& prog){

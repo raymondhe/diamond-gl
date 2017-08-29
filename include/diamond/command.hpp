@@ -25,11 +25,8 @@ namespace NS_NAME {
 
     class _mode: public base {
     public:
-        _mode(GLuint& mode) {
+        _mode(GLuint mode) {
             this->set_object(mode);
-        }
-        _mode(GLuint&& mode = 0) {
-            this->set_object(std::forward<GLuint>(mode));
         }
 
         void arrays(GLint first, GLsizei count = 1, GLsizei primcount = 1) {

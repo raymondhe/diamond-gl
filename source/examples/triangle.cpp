@@ -70,15 +70,12 @@ int main() {
 
     // create buffer
     //dgl::buffer vbo;
-    std::tuple<dgl::structured_buffer<glm::vec3>, dgl::structured_buffer<glm::vec3>> &bufs = dgl::buffer::create<glm::vec3, glm::vec3>();
-    auto[vbo, v2b] = bufs;
-
-    dgl::buffer u8buf(vbo); // now type conversion is legal
+    dgl::buffer vbo; // now type conversion is legal
 
     //dgl::buffer vbo;
     //vbo.storage(3 * sizeof(glm::vec3));
-    vbo.storage(3);
-    vbo.subdata(0, {{
+    vbo.storage(3 * sizeof(glm::vec3));
+    vbo.subdata<glm::vec3>(0, {{
         { -0.5f, -0.5f, 0.0f }, // left  
         { 0.5f, -0.5f, 0.0f }, // right 
         { 0.0f,  0.5f, 0.0f }  // top   
@@ -87,22 +84,19 @@ int main() {
     // create VAO
     dgl::vertex_array vao;
 
-    auto binding = vao.create_binding<glm::vec3, glm::vec2>(0);
-    binding.vertex_buffer(std::make_tuple(std::get<0>(bufs), static_cast<dgl::structured_buffer<glm::vec2>>(std::get<1>(bufs))));
-    //binding.vertex_buffer<glm::vec3>(vbo, 0);
+    auto binding = vao.create_binding<glm::vec3>(0);
+    binding.vertex_buffer(vbo);
 
     auto attribute = vao.create_attribute(0);
     attribute.attrib_format(3, GL_FLOAT, GL_FALSE);
     attribute.binding(binding);
 
-    
     // program uniform constant example
     auto uniform = program.get_uniform<int>(0);
     uniform = 0;
 
     // SSBO binding example 
     dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
-    //ssbo_binding.bind(vbo);
     ssbo_binding.bind<glm::vec3>(vbo); // multi-bind
 
 

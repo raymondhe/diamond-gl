@@ -35,6 +35,7 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "vector": "cpp",
-        "memory": "cpp"
+        "memory": "cpp",
+        "tuple": "cpp"
     }
 }

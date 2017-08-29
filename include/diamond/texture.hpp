@@ -18,9 +18,8 @@ namespace NS_NAME {
         texture * gltex;
 
     public:
-        ~texture_level() { base::deallocate(); };
-        texture_level(texture& tex, GLint&& level = 0);
-        texture_level(texture& tex, GLint& level);
+        ~texture_level() {  };
+        texture_level(texture& tex, GLint level = 0);
 
         void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
         void subimage(glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels);
@@ -33,7 +32,7 @@ namespace NS_NAME {
         std::vector<T>& get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, std::vector<T>& buffer) const;
 
         template<class T>
-        std::vector<T>& get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const;
+        std::vector<T> get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const;
 
         template<class T>
         T * get_parameter(GLenum pname, T * params = nullptr) const;
@@ -62,23 +61,15 @@ namespace NS_NAME {
 
         ~texture(){
             glDeleteTextures(1, thisref);
-            base::deallocate();
         }
 
 
         // new multi-bind creator
         static std::vector<texture> create(_texture_context &gltarget, size_t n = 1);
 
-
-
-        texture_level& get_level(GLint&& level = 0) {
-            return *(new texture_level(thisref, std::forward<GLint>(level)));
+        texture_level get_level(GLint level = 0) {
+            return std::move(texture_level(thisref, std::move(level)));
         }
-
-        texture_level& get_level(GLint& level) {
-            return *(new texture_level(thisref, level));
-        }
-
 
         _texture_context& target() const {
             return *gltarget;
@@ -194,22 +185,17 @@ namespace NS_NAME {
 
         // get subimage as vector
         template<class T>
-        std::vector<T>& get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
+        std::vector<T> get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
             std::vector<T> buffer(buffersize);
             this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
-            return buffer;
+            return std::move(buffer);
         }
     };
 
 
-    texture_level::texture_level(texture& tex, GLint& level) {
+    texture_level::texture_level(texture& tex, GLint level) {
         gltex = &tex;
         this->set_object(level);
-    }
-
-    texture_level::texture_level(texture& tex, GLint&& level) {
-        gltex = &tex;
-        this->set_object(std::forward<GLint>(level));
     }
 
     void texture_level::subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels) {
@@ -236,8 +222,8 @@ namespace NS_NAME {
 
     // get subimage as vector
     template<class T>
-    std::vector<T>& texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
-        return gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffersize);
+    std::vector<T> texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
+        return std::move(gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffersize));
     }
 
     template<class T>
@@ -255,7 +241,6 @@ namespace NS_NAME {
     class sampler: public base {
     public:
         sampler(){
-            base::allocate(1);
             glCreateSamplers(1, thisref);
         }
 
@@ -323,8 +308,7 @@ namespace NS_NAME {
     public:
         friend _texture_context;
         texture_binding(GLuint binding = 0) {
-            base::allocate(1);
-            this->set_value(binding);
+            this->set_object(std::move(binding));
         }
 
         ~texture_binding(){}
@@ -354,11 +338,8 @@ namespace NS_NAME {
     // image binding
     class image: public base {
     public:
-        image(GLuint&& binding = 0) {
-            this->set_object(std::forward<GLuint>(binding));
-        }
-        image(GLuint& binding) {
-            this->set_object(binding);
+        image(GLuint binding = 0) {
+            this->set_object(std::move(binding));
         }
 
         // bind image texture
@@ -371,21 +352,18 @@ namespace NS_NAME {
     // contexted texture binding
     class _texture_context: public base {
     public:
-        _texture_context(GLuint &binding) {
-            this->set_object(binding);
-        }
-        _texture_context(GLuint &&binding = 0) {
-            this->set_object(std::forward<GLuint>(binding));
+        _texture_context(GLuint binding = 0) {
+            this->set_object(std::move(binding));
         }
 
         // create multiply texture
-        std::vector<texture>&& create(size_t n){
-            return texture::create(*this, n);
+        std::vector<texture> create(size_t n){
+            return std::move(texture::create(*this, n));
         }
 
         // create single texture
-        texture&& create() {
-            return texture(*this);
+        texture create() {
+            return std::move(texture(*this));
         }
 
         // context named binding
@@ -396,7 +374,6 @@ namespace NS_NAME {
 
     texture::texture(_texture_context &gltarget) {
         this->gltarget = &gltarget;
-        base::allocate(1);
         glCreateTextures(gltarget, 1, (GLuint *)thisref);
     };
 
@@ -409,11 +386,10 @@ namespace NS_NAME {
         GLuint * objects = new GLuint[n];
         std::vector<texture> textures;
         for (intptr_t pt = 0; pt < n; pt++) {
-            textures.push_back(texture(gltarget, objects + pt));
+            textures.push_back(std::move(texture(gltarget, objects + pt)));
         }
         glCreateTextures((GLenum)gltarget, n, objects);
-        //return std::forward<std::vector<texture>>(textures);
-        return textures;
+        return std::move(textures);
     }
 
 
