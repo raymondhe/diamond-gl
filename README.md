@@ -14,14 +14,14 @@ All features are WIP.
 - Full support of Direct State Access
 - (Not yet done) Support of most OpenGL loaders
 
-## BUT...
+### Update at 30.08.2017
 
-We thinking about rewrite wrapper. 
+- Removed weird tuple semantics
+- Buffers always untyped (unitype) by default
+- Mostly, actions moved to runtine
+- VBO binding now can have type
+- Replaced pointers to inline variable
 
-Need resolve these issues: 
-- We want move most actions to runtime. 
-- Remove tuple semantic. 
-- Remove code bloat. 
-- Clean STL semantic.
-- Make VAO binding with template type.
-- By default make void buffer, but make typed proxy (which will converted to void buffer). 
+## Nearly planned
+
+- Buffer typed proxy
