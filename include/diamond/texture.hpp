@@ -384,11 +384,11 @@ namespace NS_NAME {
 
     std::vector<texture> texture::create(_texture_context &gltarget, size_t n) {
         GLuint * objects = new GLuint[n];
+        glCreateTextures(gltarget, n, objects);
         std::vector<texture> textures;
         for (intptr_t pt = 0; pt < n; pt++) {
             textures.push_back(std::move(texture(gltarget, objects + pt)));
         }
-        glCreateTextures((GLenum)gltarget, n, objects);
         return std::move(textures);
     }
 

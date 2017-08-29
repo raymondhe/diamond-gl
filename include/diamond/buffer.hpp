@@ -20,11 +20,11 @@ namespace NS_NAME {
         // vector of buffers creator
         static decltype(auto) create(GLint n) {
             GLuint * objects = new GLuint[n];
+            glCreateBuffers(n, objects);
             std::vector<structured_buffer<T>> buffers;
             for (intptr_t pt = 0; pt < n; pt++) {
                 buffers.push_back(std::move(buffer(objects + pt)));
             }
-            glCreateBuffers(n, objects);
             return std::move(buffers);
         }
 
