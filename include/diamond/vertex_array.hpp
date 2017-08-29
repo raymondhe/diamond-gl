@@ -39,6 +39,9 @@ namespace NS_NAME {
 
         template<class... T>
         void vertex_buffer(std::tuple<structured_buffer<T>...>& buf, const GLintptr * offsets = nullptr);
+
+        template<class... T>
+        void vertex_buffer(std::tuple<buffer...>& buf, const GLintptr * offsets = nullptr);
     };
     
     template<class... T>
@@ -188,6 +191,7 @@ namespace NS_NAME {
         if (!offsets) offsets = new GLintptr[N]{0};
         glVertexArrayVertexBuffers(*glvao, thisref, N, buffers, offsets, strides);
     }
+
 
     vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint& binding) {
         glvao = &vao;

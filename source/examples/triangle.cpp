@@ -2,6 +2,8 @@
 #include <GLFW/glfw3.h>
 #include <include/diamond/all.hpp>
 #include <iostream>
+#include <tuple>
+#include <utility>
 
 int SCR_WIDTH = 800;
 int SCR_HEIGHT = 600;
@@ -17,7 +19,7 @@ std::string fragmentShaderSource = "#version 460 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(0.2f, 1.0f, 0.5f, 1.0f);\n"
 "}\n\0";
 
 
@@ -68,7 +70,7 @@ int main() {
 
     // create buffer
     //dgl::buffer vbo;
-    auto bufs = dgl::buffer::create<glm::vec3, glm::vec2>();
+    std::tuple<dgl::structured_buffer<glm::vec3>, dgl::structured_buffer<glm::vec3>> &bufs = dgl::buffer::create<glm::vec3, glm::vec3>();
     auto[vbo, v2b] = bufs;
 
     dgl::buffer u8buf(vbo); // now type conversion is legal
@@ -86,7 +88,7 @@ int main() {
     dgl::vertex_array vao;
 
     auto binding = vao.create_binding<glm::vec3, glm::vec2>(0);
-    binding.vertex_buffer(bufs);
+    binding.vertex_buffer(std::make_tuple(std::get<0>(bufs), static_cast<dgl::structured_buffer<glm::vec2>>(std::get<1>(bufs))));
     //binding.vertex_buffer<glm::vec3>(vbo, 0);
 
     auto attribute = vao.create_attribute(0);
