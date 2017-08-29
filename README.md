@@ -16,6 +16,7 @@ All features are WIP.
 
 ### Update at 30.08.2017
 
+- Rewrite semantics
 - Removed weird tuple semantics
 - Buffers always untyped (unitype) by default
 - Mostly, actions moved to runtine
