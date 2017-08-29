@@ -97,7 +97,7 @@ int main() {
 
     // SSBO binding example 
     dgl::buffer_binding ssbo_binding(dgl::buffer_target::shader_storage, 0);
-    ssbo_binding.bind<glm::vec3>(vbo); // multi-bind
+    ssbo_binding.bind(vbo); // multi-bind
 
 
     // create texture

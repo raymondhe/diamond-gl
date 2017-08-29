@@ -103,10 +103,7 @@ namespace NS_NAME {
         }
         ~buffer_binding();
 
-        template<typename T>
         void bind(buffer& buf);
-
-        template<typename T>
         void bind_range(buffer& buf, GLintptr offset = 0, GLsizei size = 1);
     };
 
@@ -139,12 +136,10 @@ namespace NS_NAME {
 
 
     // basic bind support
-    template<typename T>
     void buffer_binding::bind(buffer& buf) {
         glBindBufferBase(*gltarget, thisref, buf);
     }
 
-    template<typename T>
     void buffer_binding::bind_range(buffer& buf, GLintptr offset, GLsizei size) {
         glBindBufferRange(*gltarget, thisref, buf, offset, size);
     }
