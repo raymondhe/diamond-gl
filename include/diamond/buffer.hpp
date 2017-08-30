@@ -18,6 +18,7 @@ namespace NS_NAME {
 
     public:
 
+        void_buffer<T>(void_buffer<T>& another) { this->set_object(another.globj); } // when assign, share pointer
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
         ~void_buffer<T>() { if (base::ready_free()) glDeleteBuffers(1, thisref); }
