@@ -123,14 +123,13 @@ int main() {
         // managment
         dgl::managment.use_program(program);
         dgl::managment.bind_vertex_array(vao);
+        binding.vertex_buffer(vbo, 0);
 
         // states
-        dgl::option.enable(dgl::options::blend);
         dgl::clear.color(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
         dgl::clear.depth(1.f);
         
         // commands
-        binding.vertex_buffer(vbo, 0);
         dgl::commands.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         dgl::commands.draw_arrays(dgl::draw_mode::triangles, 0, 3);
 
