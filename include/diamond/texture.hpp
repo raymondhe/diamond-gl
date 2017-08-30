@@ -18,7 +18,9 @@ namespace NS_NAME {
         texture * gltex;
 
     public:
-        ~texture_level() {  };
+        ~texture_level() { 
+            this->set_object(-1);
+        };
         texture_level(texture& tex, GLint level = 0);
 
         void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
@@ -61,6 +63,7 @@ namespace NS_NAME {
 
         ~texture(){
             glDeleteTextures(1, thisref);
+            this->set_object(-1);
         }
 
 
@@ -246,6 +249,7 @@ namespace NS_NAME {
 
         ~sampler(){
             glDeleteSamplers(1, thisref);
+            this->set_object(-1);
         }
 
 
@@ -311,7 +315,9 @@ namespace NS_NAME {
             this->set_object(std::move(binding));
         }
 
-        ~texture_binding(){}
+        ~texture_binding(){
+            this->set_object(-1);
+        }
 
         void bind_sampler(sampler& sam) {
             glBindSampler(thisref, sam);

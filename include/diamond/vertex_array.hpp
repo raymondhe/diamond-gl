@@ -21,7 +21,7 @@ namespace NS_NAME {
             this->set_object(std::move(binding));
         }
         ~vertex_array_binding(){
-
+            this->set_object(-1);
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
@@ -57,6 +57,7 @@ namespace NS_NAME {
         }
         ~vertex_array() {
             glDeleteVertexArrays(1, thisref);
+            this->set_object(-1);
         }
 
         template<class... T>
@@ -64,7 +65,7 @@ namespace NS_NAME {
             return std::move(vertex_array_binding<T...>(thisref, std::move(binding)));
         }
 
-        vertex_array_attribute& create_attribute(GLuint attribute = 0){
+        vertex_array_attribute create_attribute(GLuint attribute = 0){
             return std::move(vertex_array_attribute(thisref, std::move(attribute)));
         }
 
@@ -80,7 +81,10 @@ namespace NS_NAME {
         glEnableVertexArrayAttrib(*glvao, thisref);
     }
 
+    // attribute removing when not using anymore
     vertex_array_attribute::~vertex_array_attribute() {
+        //glDisableVertexArrayAttrib(*glvao, thisref);
+        //this->set_object(-1);
     }
 
     void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {

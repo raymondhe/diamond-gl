@@ -8,9 +8,6 @@
 namespace NS_NAME {
 
     template<class T>
-    class structured_buffer;
-
-    template<class T>
     class void_buffer: public base {
     protected:
         using buffer = void_buffer<T>;
@@ -18,10 +15,10 @@ namespace NS_NAME {
     public:
 
         // vector of buffers creator
-        static decltype(auto) create(GLint n) {
+        static std::vector<buffer> create(GLint n) {
             GLuint * objects = new GLuint[n];
             glCreateBuffers(n, objects);
-            std::vector<structured_buffer<T>> buffers;
+            std::vector<buffer> buffers;
             for (intptr_t pt = 0; pt < n; pt++) {
                 buffers.push_back(std::move(buffer(objects + pt)));
             }
@@ -30,7 +27,7 @@ namespace NS_NAME {
 
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(allocationPointer); } // can be used with allocators
         void_buffer<T>() { glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() { glDeleteBuffers(1, thisref); }
+        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_object(-1); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);

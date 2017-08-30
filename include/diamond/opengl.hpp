@@ -17,6 +17,8 @@ namespace NS_NAME {
     class base {
     protected:
         GLuint globj = 0;
+        void set_object(GLuint obj) { globj = obj; }
+        void set_object(GLuint * obj) { globj = *obj; }
         void set_object(GLint obj) { globj = obj; }
         void set_object(GLint * obj) { globj = *obj; }
         operator GLuint*() { return &globj; }

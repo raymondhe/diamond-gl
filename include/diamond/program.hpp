@@ -17,6 +17,7 @@ namespace NS_NAME {
 
         ~shader() {
             glDeleteShader(thisref);
+            this->set_object(-1);
         }
 
         template<class T>
@@ -156,6 +157,7 @@ namespace NS_NAME {
 
         ~program() { 
             glDeleteProgram(thisref);
+            this->set_object(-1);
         }
 
         uniform get_uniform(GLuint location) const {
@@ -218,6 +220,7 @@ namespace NS_NAME {
          }
         ~program_pipeline() {
             glDeleteProgramPipelines(1, thisref);
+            this->set_object(-1);
         }
 
         void use_stages(program_stage_bits stages, program& prog){

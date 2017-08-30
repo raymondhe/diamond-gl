@@ -71,6 +71,7 @@ int main() {
     // create buffer
     //dgl::buffer vbo;
     dgl::buffer vbo; // now type conversion is legal
+    //auto vbos = dgl::buffer::create(2);
 
     //dgl::buffer vbo;
     //vbo.storage(3 * sizeof(glm::vec3));
