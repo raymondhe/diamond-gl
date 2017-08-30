@@ -19,10 +19,12 @@ namespace NS_NAME {
         std::shared_ptr<GLuint> globj;
         void set_object(std::shared_ptr<GLuint>& obj) { globj = obj; } // share pointer
         void set_object(std::shared_ptr<GLuint>&& obj) { globj = obj; } // share pointer
-        void set_object(GLuint obj) { globj = std::make_shared<GLuint>(obj); }
-        void set_object(GLuint * obj) { globj = std::shared_ptr<GLuint>(obj); }
-        void set_object(GLint obj) { globj = std::make_shared<GLuint>(obj); }
-        void set_object(GLint * obj) { globj = std::shared_ptr<GLuint>((GLuint *)obj); }
+        void set_object(GLuint&& obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLuint& obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLuint* obj) { globj = std::shared_ptr<GLuint>(obj); }
+        void set_object(GLint&& obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLint& obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLint* obj) { globj = std::shared_ptr<GLuint>((GLuint *)obj); }
         operator GLuint*() { return globj.get(); }
 
         std::shared_ptr<GLuint> _get_shared() const {
