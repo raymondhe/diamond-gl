@@ -25,7 +25,6 @@ namespace NS_NAME {
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
-        void vertex_buffer(std::vector<buffer>& buf, const GLintptr * offsets = 0);
         void vertex_buffer(buffer*bufs, const GLintptr * offsets = 0);
     };
 
@@ -109,14 +108,6 @@ namespace NS_NAME {
     void vertex_array_binding<T...>::vertex_buffer(buffer& buf, GLintptr offset) {
         GLsizei * strides = get_stride_wrap<T...>();
         glVertexArrayVertexBuffer(*glvao, thisref, buf, offset, strides[0]);
-    }
-
-    template<class... T>
-    void vertex_array_binding<T...>::vertex_buffer(std::vector<buffer>& bufs, const GLintptr * offsets) {
-        constexpr size_t N = sizeof...(T);
-        GLsizei * strides = get_stride_wrap<T...>();
-        if (!offsets) offsets = new GLintptr[N]{0};
-        glVertexArrayVertexBuffers(*glvao, thisref, std::min(N, bufs.size()), bufs.data(), offsets, strides);
     }
 
     template<class... T>

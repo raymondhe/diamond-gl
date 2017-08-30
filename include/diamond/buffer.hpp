@@ -8,22 +8,15 @@
 namespace NS_NAME {
 
     template<class T>
+    class void_buffer;
+
+    template<class T>
     class void_buffer: public base {
     protected:
         using buffer = void_buffer<T>;
+        using buffer_ptr = void_buffer<T> *;
 
     public:
-
-        // vector of buffers creator
-        static std::vector<buffer> create(GLint n) {
-            GLuint * objects = new GLuint[n];
-            glCreateBuffers(n, objects);
-            std::vector<buffer> buffers;
-            for (intptr_t pt = 0; pt < n; pt++) {
-                buffers.push_back(std::move(buffer(objects + pt)));
-            }
-            return std::move(buffers);
-        }
 
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(allocationPointer); } // can be used with allocators
         void_buffer<T>() { glCreateBuffers(1, thisref); }
