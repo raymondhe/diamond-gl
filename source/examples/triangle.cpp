@@ -69,10 +69,10 @@ int main() {
     }
 
     // create buffer
-    //dgl::buffer vbo;
+    dgl::buffer vbo;
     //dgl::buffer another = vbo;
-    std::vector<dgl::buffer> vbos = dgl::buffer::create(2);
-    dgl::buffer& vbo = vbos[0];
+    //std::vector<dgl::buffer> vbos = dgl::buffer::create(2);
+    //dgl::buffer& vbo = vbos[0];
 
     //dgl::buffer vbo;
     //vbo.storage(3 * sizeof(glm::vec3));
