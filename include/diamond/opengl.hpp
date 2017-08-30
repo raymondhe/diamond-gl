@@ -38,10 +38,7 @@ namespace NS_NAME {
             globj = std::shared_ptr<GLuint>(new GLuint[1]{0xFFFFFFFF});
         }
         bool ready_free() {
-            return globj.use_count() <= 1; // count references before remove
-        }
-        bool is_active() {
-            return !!globj;
+            return globj && globj.use_count() <= 1; // count references before remove
         }
     };
 

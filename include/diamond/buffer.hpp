@@ -26,7 +26,7 @@ namespace NS_NAME {
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // re-assign gl pointer value to class
         void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
         ~void_buffer<T>() {
-            if (base::is_active() && base::ready_free()) {
+            if (base::ready_free()) {
                 glDeleteBuffers(1, thisref);
             }
         }
