@@ -38,7 +38,7 @@ namespace NS_NAME {
             for (intptr_t pt = 0; pt < n; pt++) {
                 buffers.push_back(buffer(objects + pt));
             }
-            return buffers;
+            return std::move(buffers);
         }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
