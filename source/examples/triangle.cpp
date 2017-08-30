@@ -130,6 +130,7 @@ int main() {
         dgl::clear.depth(1.f);
         
         // commands
+        binding.vertex_buffer(vbo, 0);
         dgl::commands.clear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         dgl::commands.draw_arrays(dgl::draw_mode::triangles, 0, 3);
 

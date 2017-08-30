@@ -77,7 +77,7 @@ namespace NS_NAME {
 
     vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
         glvao = &vao;
-        this->set_object(binding);
+        this->set_object(std::move(binding));
         glEnableVertexArrayAttrib(*glvao, thisref);
     }
 
