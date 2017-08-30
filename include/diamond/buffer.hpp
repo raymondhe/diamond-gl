@@ -22,7 +22,7 @@ namespace NS_NAME {
     public:
 
         void_buffer<T>(buffer& another) { this->set_object(another._get_shared()); } // when assign, share pointer
-        void_buffer<T>(const buffer& another) { this->set_object(another._get_shared()); } // when assign, share pointer
+        void_buffer<T>(buffer&& another) { this->set_object(another._get_shared()); } // when assign, share pointer
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // re-assign gl pointer value to class
         void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
         ~void_buffer<T>() {

@@ -27,9 +27,6 @@ namespace NS_NAME {
         void set_object(GLint* obj) { globj = std::shared_ptr<GLuint>((GLuint *)obj); }
         operator GLuint*() { return globj.get(); }
 
-        std::shared_ptr<GLuint> _get_shared() const {
-            return std::move(globj);
-        }
         std::shared_ptr<GLuint>& _get_shared() {
             return globj;
         }
