@@ -38,6 +38,7 @@ namespace NS_NAME {
             for (intptr_t pt = 0; pt < n; pt++) {
                 buffers.push_back(buffer(objects + pt));
             }
+            delete objects; // free, because pointer values was copied
             return std::move(buffers);
         }
 
