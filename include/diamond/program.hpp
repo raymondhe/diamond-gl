@@ -8,16 +8,28 @@ namespace NS_NAME {
 
     class program;
 
-
-    class shader: public base {
+    class shader_builder {
     public:
-        shader(GLenum shaderType) {
-            this->set_object(glCreateShader(shaderType));
+        static GLuint create(GLenum shader_type){
+            return glCreateShader(shader_type);
         }
+        static void release(GLuint * heap){
+            glDeleteShader(*heap);
+        }
+    };
 
-        ~shader() {
-            if (base::ready_free()) glDeleteShader(thisref);
+    class shader: public gl_object<shader_builder> {
+    protected:
+        using base = gl_object<shader_builder>;
+
+    public:
+        // constructor (variadic)
+        shader(GLenum shader_type) { 
+            base::create_heap(shader_type); 
         }
+        shader(shader& another) { base::move(another); } // copy (it refs)
+        shader(shader&& another) { base::move(std::forward<shader>(another)); } // move
+        shader(GLuint * another) { base::move(another); } // heap by ptr
 
         template<class T>
         T get_val(GLenum pname, T * params = nullptr) const {
@@ -56,7 +68,8 @@ namespace NS_NAME {
         }
 
         void binary(const std::vector<GLchar>& binary, GLenum binType = GL_SPIR_V_BINARY){
-            glShaderBinary(1, thisref, binType, binary.data(), binary.size());
+            GLuint ptr = thisref;
+            glShaderBinary(1, &ptr, binType, binary.data(), binary.size());
         }
 
         void specialize(std::string entry_point = "main", const std::vector<GLuint> &constantIndex = std::vector<GLuint>(0), const GLuint * constantValue = nullptr){
@@ -71,9 +84,10 @@ namespace NS_NAME {
 
 
 
-    class uniform: public base {
+    class uniform {
     protected:
         friend program;
+        GLuint location = 0;
         GLuint program = 0;
 
     public:
@@ -81,9 +95,7 @@ namespace NS_NAME {
         ~uniform() {
         }
 
-        uniform(GLuint prog, GLuint location = 0) {
-            this->set_object(location);
-            program = prog;
+        uniform(GLuint prog, GLuint location = 0): location(location), program(prog) {
         }
 
         // base templates
@@ -105,6 +117,10 @@ namespace NS_NAME {
             if constexpr (std::is_same<T, double>::value) glProgramUniform1dv(program, thisref, value.size(), value.data());
             if constexpr (std::is_same<T, int64_t>::value) glProgramUniform1iv64ARB(program, thisref, value.size(), value.data());
             if constexpr (std::is_same<T, uint64_t>::value) glProgramUniform1uiv64ARB(program, thisref, value.size(), value.data());
+        }
+
+        operator GLuint() {
+            return location;
         }
     };
 
@@ -135,28 +151,47 @@ namespace NS_NAME {
 
 
 
-    class program: public base {
+
+    class program_builder {
     public:
-        program() {
-            this->set_object(glCreateProgram());
+        static GLuint create() {
+            return glCreateProgram();
         }
 
-        program(const std::vector<std::string>& shaders, GLenum shaderType){
+        static GLuint create(GLenum shaderType, const std::vector<std::string>& shaders){
             const GLchar ** parts = new const GLchar*[shaders.size()];
             for (int i = 0; i < shaders.size(); i++) {
                 parts[i] = shaders[i].c_str();
             }
-            this->set_object(glCreateShaderProgramv(shaderType, shaders.size(), parts));
+            return glCreateShaderProgramv(shaderType, shaders.size(), parts);
         }
 
-        program(std::string source, GLenum shaderType){
+        static GLuint create(GLenum shaderType, std::string source){
             const GLchar * src = source.c_str();
-            this->set_object(glCreateShaderProgramv(shaderType, 1, &src));
+            return glCreateShaderProgramv(shaderType, 1, &src);
         }
 
-        ~program() { 
-            if (base::ready_free()) glDeleteProgram(thisref);
+        static void release(GLuint * heap){
+            glDeleteShader(*heap);
         }
+    };
+
+    class program: public gl_object<program_builder> {
+    protected:
+        using base = gl_object<program_builder>;
+
+    public:
+
+
+        // constructor (variadic)
+        program() { base::create_heap(); }
+        program(GLenum shaderType, const std::vector<std::string>& shaders) { base::create_heap(shaderType, shaders); }
+        program(GLenum shaderType, std::string source) { base::create_heap(shaderType, source); }
+
+        program(program& another) { base::move(another); } // copy (it refs)
+        program(program&& another) { base::move(std::forward<program>(another)); } // move
+        program(GLuint * another) { base::move(another); } // heap by ptr
+
 
         uniform get_uniform(GLuint location) const {
             return uniform(thisref, location);
@@ -210,16 +245,31 @@ namespace NS_NAME {
     };
 
 
-    // program pipeline
-    class program_pipeline: public base {
+
+    class pipeline_builder {
     public:
-         program_pipeline() {
-             base::make_ptr();
-             glCreateProgramPipelines(1, thisref);
-         }
-        ~program_pipeline() {
-            if (base::ready_free()) glDeleteProgramPipelines(1, thisref);
+        static void create(GLuint * heap){
+            glCreateProgramPipelines(1, heap);
         }
+        static void release(GLuint * heap){
+            glCreateProgramPipelines(1, heap);
+        }
+    };
+
+
+    // program pipeline
+    class program_pipeline: public gl_object<pipeline_builder> {
+    protected:
+        using base = gl_object<pipeline_builder>;
+
+    public:
+
+        // constructor (variadic)
+        template<class ...ARG>
+        program_pipeline(ARG&&... args) { base::create_alloc(std::forward<ARG>(args)...); }
+        program_pipeline(program_pipeline& another) { base::move(another); } // copy (it refs)
+        program_pipeline(program_pipeline&& another) { base::move(std::forward<program_pipeline>(another)); } // move
+        program_pipeline(GLuint * another) { base::move(another); } // heap by ptr
 
         void use_stages(program_stage_bits stages, program& prog){
             glUseProgramStages(thisref, stages.bitfield, prog);

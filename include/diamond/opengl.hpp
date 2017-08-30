@@ -14,6 +14,66 @@
 
 namespace NS_NAME {
 
+
+    template<class GL_OBJ>
+    class gl_object {
+    protected:
+        //GLuint globj = -1;
+        template<class GL_OBJ>
+        friend class gl_object;
+
+        // shared GL object (don't delete without needless)
+        std::shared_ptr<GLuint> globj;
+
+        // create object by pointer
+        template<class ...ARG>
+        void create_alloc(ARG&&... args){
+            //GL_OBJ::create(&globj, std::forward<ARG>(args)...);
+            globj = std::make_shared<GLuint>(-1);
+            GL_OBJ::create(globj.get(), std::forward<ARG>(args)...);
+        }
+
+        // create from program, shader, other not allocatable
+        template<class ...ARG>
+        void create_heap(ARG&&... args) {
+            //globj = GL_OBJ::create(std::forward<ARG>(args)...);
+            globj = std::make_shared<GLuint>(GL_OBJ::create(std::forward<ARG>(args)...));
+        }
+
+    public:
+
+        // move GL object
+        template<class ANOTHER>
+        void move(ANOTHER&& obj) {
+            globj = std::move(obj.globj);
+        }
+
+        // reference by GL object
+        template<class ANOTHER>
+        void move(ANOTHER& obj) {
+            globj = obj.globj;
+        }
+
+        // construct from heap pointer
+        void move(GLuint* obj) {
+            globj = std::make_shared<GLuint>(*obj); // copy allocated pointer, because can be deleted by another GL object
+        }
+
+        // constructor default
+        template<class ...ARG>
+        explicit gl_object(ARG&&... args) {}
+
+
+        // destructor
+        ~gl_object(){
+            if (globj && globj.use_count() <= 1) GL_OBJ::release(globj.get());
+        }
+
+        operator const GLuint&() const { return (*globj); }
+    };
+
+
+    /*
     class base {
     protected:
         std::shared_ptr<GLuint> globj;
@@ -41,7 +101,7 @@ namespace NS_NAME {
             return globj && globj.use_count() <= 1; // count references before remove
         }
     };
-
+*/
 
     // some hack
     template <class... T>

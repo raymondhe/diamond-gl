@@ -23,11 +23,12 @@ namespace NS_NAME {
         }
     };
 
-    class _mode: public base {
+    class _mode {
+    protected:
+        GLuint target;
+
     public:
-        _mode(GLuint mode) {
-            this->set_object(mode);
-        }
+        _mode(GLuint target) : target(target) {}
 
         void arrays(GLint first, GLsizei count = 1, GLsizei primcount = 1) {
             glDrawArraysInstanced(thisref, first, count, primcount);
@@ -52,6 +53,8 @@ namespace NS_NAME {
         void elements_indirect(GLenum type = GL_UNSIGNED_INT, const void *indirect = 0) {
             glDrawElementsIndirect(thisref, type, indirect);
         }
+
+        operator GLenum(){ return target; }
     };
 
 

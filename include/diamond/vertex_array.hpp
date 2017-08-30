@@ -12,14 +12,15 @@ namespace NS_NAME {
     class vertex_array;
 
     template<class... T>
-    class vertex_array_binding: public base {
+    class vertex_array_binding {
         friend vertex_array;
+        GLuint binding = 0;
         vertex_array * glvao;
 
     public:
         vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
-            glvao = &vao;
-            this->set_object(binding);
+            this->glvao = &vao;
+            this->binding = binding;
         }
         ~vertex_array_binding(){
         }
@@ -27,17 +28,37 @@ namespace NS_NAME {
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
         void vertex_buffer(std::vector<buffer>& buf, const GLintptr * offsets = 0);
         void vertex_buffer(buffer*bufs, const GLintptr * offsets = 0);
+
+        operator GLuint(){
+            return binding;
+        }
     };
 
 
-    class vertex_array_attribute: public base {
+
+    class vattrib_builder {
+    public:
+        static GLuint create(vertex_array&vao, GLuint attribute);
+        static void release(GLuint * heap);
+    };
+
+
+
+    class vertex_array_attribute: public gl_object<vattrib_builder> {
     protected:
+        using base = gl_object<vattrib_builder>;
         friend vertex_array;
         vertex_array * glvao;
 
     public:
-        ~vertex_array_attribute();
-        vertex_array_attribute(vertex_array& vao, GLuint binding = 0);
+
+        // constructor
+        vertex_array_attribute(vertex_array& vao, GLuint attribute) { base::create_heap(vao, attribute); glvao = &vao; }
+        vertex_array_attribute(vertex_array_attribute& another) { base::move(another); } // copy (it refs)
+        vertex_array_attribute(vertex_array_attribute&& another) { base::move(std::forward<vertex_array_attribute>(another)); } // move
+        vertex_array_attribute(GLuint * another) { base::move(another); } // heap by ptr
+
+
         void attrib_format(GLint size, GLenum type, GLboolean normalized = false, GLuint relativeoffset = 0);
         void attrib_format_int(GLint size, GLenum type, GLuint relativeoffset = 0);
         void attrib_format_long(GLint size, GLenum type, GLuint relativeoffset = 0);
@@ -48,17 +69,29 @@ namespace NS_NAME {
     };
 
 
-
-
-    class vertex_array: public base {
+    class vertex_array_builder {
     public:
-        vertex_array() {
-            base::make_ptr();
-            glCreateVertexArrays(1, thisref);
-        }
-        ~vertex_array() {
-            if (base::ready_free()) glDeleteVertexArrays(1, thisref);
-        }
+        static void create(GLuint * heap) {
+            glCreateVertexArrays(1, heap);
+        };
+        static void release(GLuint * heap) {
+            glDeleteVertexArrays(1, heap);
+        };
+    };
+
+
+    class vertex_array: public gl_object<vertex_array_builder> {
+    protected:
+        using base = gl_object<vertex_array_builder>;
+        
+    public:
+
+        // constructor (variadic)
+        template<class ...ARG>
+        vertex_array(ARG&&... args) { base::create_alloc(std::forward<ARG>(args)...); }
+        vertex_array(vertex_array& another) { base::move(another); } // copy (it refs)
+        vertex_array(vertex_array&& another) { base::move(std::forward<vertex_array>(another)); } // move
+        vertex_array(GLuint * another) { base::move(another); } // heap by ptr
 
         template<class... T>
         vertex_array_binding<T...> create_binding(GLuint binding = 0) {
@@ -75,17 +108,14 @@ namespace NS_NAME {
     };
 
 
-    vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
-        glvao = &vao;
-        this->set_object(binding);
-        glEnableVertexArrayAttrib(*glvao, thisref);
+    GLuint vattrib_builder::create(vertex_array& vao, GLuint attrib){
+        glEnableVertexArrayAttrib(vao, attrib);
+        return attrib;
     }
 
-    // attribute removing when not using anymore
-    vertex_array_attribute::~vertex_array_attribute() {
-        if (base::ready_free()) {
-            glDisableVertexArrayAttrib(*glvao, thisref);
-        }
+    // at now unsupported
+    void vattrib_builder::release(GLuint * heap){
+        //glDisableVertexArrayAttrib(vao, *heap);
     }
 
     void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {

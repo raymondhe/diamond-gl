@@ -7,29 +7,33 @@
 
 namespace NS_NAME {
 
-    template<class T>
-    class void_buffer;
+    class buffer_builder {
+    public:
+        static void create(GLuint * heap){
+            glCreateBuffers(1, heap);
+        }
+        static void release(GLuint * heap){
+            glDeleteBuffers(1, heap);
+        }
+    };
 
     template<class T>
-    class void_buffer: public base {
+    class void_buffer: public gl_object<buffer_builder> {
     protected:
         using buffer = void_buffer<T>;
         using buffer_ptr = void_buffer<T> *;
+        using base = gl_object<buffer_builder>;
         
         template<class T>
         friend class void_buffer;
 
     public:
 
-        void_buffer<T>(buffer& another) { this->set_object(another._get_shared()); } // when assign, share pointer
-        void_buffer<T>(buffer&& another) { this->set_object(another._get_shared()); } // when assign, share pointer
-        void_buffer<T>(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // re-assign gl pointer value to class
-        void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() {
-            if (base::ready_free()) {
-                glDeleteBuffers(1, thisref);
-            }
-        }
+        // constructor (variadic)
+        buffer() { base::create_alloc(); }
+        buffer(buffer& another) { base::move(another); } // copy (it refs)
+        buffer(buffer&& another) { base::move(std::forward<buffer>(another)); } // move
+        buffer(GLuint * another) { base::move(another); } // heap by ptr
 
         static std::vector<buffer> create(GLint n) {
             GLuint * objects = new GLuint[n];
@@ -101,29 +105,32 @@ namespace NS_NAME {
     class _buffer_context;
 
     // register buffer binding
-    class buffer_binding: public base {
+    class buffer_binding {
     protected:
         friend _buffer_context;
+        GLuint binding = 0;
         _buffer_context * gltarget;
-
+        
     public:
-        buffer_binding(_buffer_context& btarget, GLuint binding = 0) {
-            gltarget = &btarget; 
-            this->set_object(binding);
+        buffer_binding(_buffer_context& btarget, GLuint binding = 0) : binding(binding) {
+            gltarget = &btarget;
         }
-        ~buffer_binding();
+        ~buffer_binding() {};
 
         void bind(buffer& buf);
         void bind_range(buffer& buf, GLintptr offset = 0, GLsizei size = 1);
+
+        operator GLuint(){ return binding; }
     };
 
 
     // contextual targeted bindings
-    class _buffer_context: public base {
+    class _buffer_context {
+    protected:
+        GLenum target = 0;
+
     public:
-        _buffer_context(GLuint binding) {
-            this->set_object(binding);
-        }
+        _buffer_context(GLenum target) : target(target) {}
 
         buffer_binding create_binding(GLuint binding = 0){
             return buffer_binding(thisref, binding);
@@ -134,15 +141,10 @@ namespace NS_NAME {
             glBindBuffer(thisref, buf);
         }
 
+        operator GLenum(){ return target; }
 
         // TODO support of non-DSA (binded) operations
     };
-
-
-    
-    buffer_binding:: ~buffer_binding() { // unbind
-        glBindBufferBase(*gltarget, thisref, 0);
-    }
 
 
     // basic bind support

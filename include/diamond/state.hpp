@@ -49,11 +49,11 @@ namespace NS_NAME {
         }
     };
 
-    class _feature: public base {
+    class _feature {
+    protected:
+        GLenum target;
     public:
-        _feature(GLuint feature) {
-            this->set_object(feature);
-        }
+        _feature(GLuint feature) : target(feature) {}
 
         void enable() {
             glEnable(thisref);
@@ -61,6 +61,10 @@ namespace NS_NAME {
 
         void disable() {
             glDisable(thisref);
+        }
+
+        operator GLenum(){
+            return target;
         }
     };
 

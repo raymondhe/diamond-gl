@@ -13,19 +13,18 @@ namespace NS_NAME {
 
     class texture;
 
-    class texture_level : public base {
+    class texture_level {
         friend texture;
+        GLuint level = 0;
         texture * gltex;
 
     public:
-        ~texture_level() { 
-        };
+        ~texture_level() {};
         texture_level(texture& tex, GLint level = 0);
 
         void subimage(GLint offset, GLuint size, GLenum format, GLenum type, const GLvoid * pixels);
         void subimage(glm::ivec2 offset, glm::uvec2 size, GLenum format, GLenum type, const GLvoid * pixels);
         void subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels);
-
 
         void get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const;
 
@@ -42,32 +41,42 @@ namespace NS_NAME {
         T get_parameter_val(GLenum pname, T * params = nullptr) const {
             return *(this->get_parameter(pname, params));
         }
+
+        operator GLuint() const {
+            return level;
+        }
     };
 
 
 
+
+
+    class texture_builder {
+    public:
+        static void create(GLuint * heap, _texture_context& target);
+        static void release(GLuint * heap){
+            glDeleteTextures(1, heap);
+        }
+    };
+
+
     // universal texture object
-    class texture: public base {
+    class texture: public gl_object<texture_builder> {
+
     protected:
         friend _texture_context;
+        using base = gl_object<texture_builder>;
         _texture_context * gltarget;
-        texture(_texture_context &gltarget, GLuint * allocation) {
-            this->set_object(*allocation);
-            this->gltarget = &gltarget;
-        };
 
     public:
-        texture() {}
-        texture(_texture_context &gltarget);
-        texture(texture& another) { this->set_object(another._get_shared()); } // when assign, share pointer
-        texture(texture&& another) { this->set_object(another._get_shared()); } // when assign, share pointer
-        texture(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // re-assign gl pointer value to class
+
+        // constructor (variadic)
+        texture(_texture_context& target) { base::create_alloc(target); gltarget = &target; } // variadic unsupported
+        texture(texture& another) { base::move(another); gltarget = &another.target(); } // copy (it refs)
+        texture(texture&& another) { base::move(std::forward<texture>(another)); gltarget = &another.target(); } // move
+        texture(_texture_context& target, GLuint * another) { base::move(another); gltarget = &target; } // heap by ptr
 
         static std::vector<texture> create(_texture_context &gltarget, size_t n = 1);
-
-        ~texture(){
-            if (base::ready_free()) glDeleteTextures(1, thisref);
-        }
 
         texture_level get_level(GLint level = 0) {
             return texture_level(thisref, level);
@@ -196,8 +205,8 @@ namespace NS_NAME {
 
 
     texture_level::texture_level(texture& tex, GLint level) {
-        gltex = &tex;
-        this->set_object(level);
+        this->gltex = &tex;
+        this->level = level;
     }
 
     void texture_level::subimage(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, const GLvoid * pixels) {
@@ -213,7 +222,7 @@ namespace NS_NAME {
     };
 
     void texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize, void *pixels) const {
-        gltex->get_image_subdata(thisref, offset, size, format, type, buffersize, pixels);
+        gltex->get_image_subdata((GLuint)thisref, offset, size, format, type, buffersize, pixels);
     }
 
     // get subimage to vector
@@ -239,19 +248,30 @@ namespace NS_NAME {
 
 
 
-    // universal sampler object
-    class sampler: public base {
+    class sampler_builder {
     public:
-        sampler(){
-            base::make_ptr();
-            glCreateSamplers(1, thisref);
+        static void create(GLuint * heap){
+            glCreateSamplers(1, heap);
         }
-
-        ~sampler(){
-            if (base::ready_free()) glDeleteSamplers(1, thisref);
+        static void release(GLuint * heap){
+            glDeleteSamplers(1, heap);
         }
+    };
 
 
+    // universal texture object
+    class sampler: public gl_object<sampler_builder> {
+
+    protected:
+        using base = gl_object<sampler_builder>;
+
+    public:
+
+        // constructor (variadic)
+        sampler() { base::create_alloc(); }
+        sampler(sampler& another) { base::move(another); } // copy (it refs)
+        sampler(sampler&& another) { base::move(std::forward<sampler>(another)); } // move
+        sampler(GLuint * another) { base::move(another); } // heap by ptr
 
         template<class T>
         void parameter_val(GLenum pname, T param) {
@@ -307,15 +327,13 @@ namespace NS_NAME {
 
 
     // texture binding
-    class texture_binding: public base {
-    public:
-        friend _texture_context;
-        texture_binding(GLuint binding = 0) {
-            this->set_object(binding);
-        }
+    class texture_binding {
+    protected:
+        GLuint binding = 0;
 
-        ~texture_binding(){
-        }
+    public:
+        texture_binding(GLuint binding = 0) : binding(binding) {}
+        ~texture_binding(){}
 
         void bind_sampler(sampler& sam) {
             glBindSampler(thisref, sam);
@@ -325,29 +343,38 @@ namespace NS_NAME {
             glBindTextureUnit(thisref, tex);
         }
 
+        operator GLuint(){
+            return binding;
+        }
+
     };
 
 
     // image binding
-    class image: public base {
+    class image {
+    protected:
+        GLuint binding = 0;
+
     public:
-        image(GLuint binding = 0) {
-            this->set_object(binding);
-        }
+        image(GLuint binding = 0): binding(binding) { }
 
         // bind image texture
         void bind_texture(texture& texture, GLint level, GLboolean layered, GLint layer, GLenum access, GLenum format) {
             glBindImageTexture(thisref, texture, level, layered, layer, access, format);
         }
+
+        operator GLuint() const {
+            return binding;
+        }
     };
 
 
     // contexted texture binding
-    class _texture_context: public base {
+    class _texture_context {
+    protected:
+        GLenum target;
     public:
-        _texture_context(GLuint binding = 0) {
-            this->set_object(binding);
-        }
+        _texture_context(GLenum target) : target(target) {}
 
         // create single texture
         texture create() {
@@ -358,13 +385,16 @@ namespace NS_NAME {
         void bind(texture& tex){
             glBindTexture(thisref, tex);
         }
-    };
 
-    texture::texture(_texture_context &gltarget) {
-        this->gltarget = &gltarget;
-        base::make_ptr();
-        glCreateTextures(gltarget, 1, (GLuint *)thisref);
+        operator GLenum(){
+            return target;
+        }
     };
+    
+    
+    void texture_builder::create(GLuint * heap, _texture_context& target){
+        glCreateTextures(target, 1, heap);
+    }
 
     void texture::copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {
         glCopyImageSubData(thisref, (GLenum)thisref.target(), srcLevel, srcOffset.x, srcOffset.y, srcOffset.z, destination, (GLenum)destination.target(), dstLevel, dstOffset.x, dstOffset.y, dstOffset.z, size.x, size.y, size.z);
