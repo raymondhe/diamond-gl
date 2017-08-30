@@ -5,6 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <utility>
+#include <algorithm>
 
 namespace NS_NAME {
 
@@ -24,6 +25,7 @@ namespace NS_NAME {
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
+        void vertex_buffer(std::vector<buffer>& buf, const GLintptr * offsets = 0);
         void vertex_buffer(buffer*bufs, const GLintptr * offsets = 0);
     };
 
@@ -111,11 +113,27 @@ namespace NS_NAME {
     }
 
     template<class... T>
+    void vertex_array_binding<T...>::vertex_buffer(std::vector<buffer>& bufs, const GLintptr * offsets) {
+        constexpr size_t N = sizeof...(T);
+        GLsizei * strides = get_stride_wrap<T...>();
+        bool hadOffsets = !!offsets;
+        if (!hadOffsets) offsets = new GLintptr[N]{ 0 };
+        GLuint * bufsp = new GLuint[N];
+        const size_t Nv = std::min(N, bufs.size());
+        for (int i = 0; i < Nv; i++) bufsp[i] = bufs[i];
+        glVertexArrayVertexBuffers(*glvao, thisref, Nv, bufsp, offsets, strides);
+        if (!hadOffsets) delete offsets;
+        delete bufsp;
+    }
+
+    template<class... T>
     void vertex_array_binding<T...>::vertex_buffer(buffer * bufs, const GLintptr * offsets) {
         constexpr size_t N = sizeof...(T);
         GLsizei * strides = get_stride_wrap<T...>();
-        if (!offsets) offsets = new GLintptr[N]{0};
+        bool hadOffsets = !!offsets;
+        if (!hadOffsets) offsets = new GLintptr[N]{ 0 };
         glVertexArrayVertexBuffers(*glvao, thisref, N, bufs, offsets, strides);
+        if (!hadOffsets) delete offsets;
     }
 
     

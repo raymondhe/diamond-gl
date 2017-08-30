@@ -59,6 +59,11 @@ namespace NS_NAME {
     public:
         texture() {}
         texture(_texture_context &gltarget);
+        texture(texture& another) { this->set_object(another._get_shared()); } // when assign, share pointer
+        texture(texture&& another) { this->set_object(another._get_shared()); } // when assign, share pointer
+        texture(GLuint * allocationPointer) { this->set_object(*allocationPointer); } // re-assign gl pointer value to class
+
+        static std::vector<texture> create(_texture_context &gltarget, size_t n = 1);
 
         ~texture(){
             if (base::ready_free()) glDeleteTextures(1, thisref);
@@ -363,6 +368,16 @@ namespace NS_NAME {
 
     void texture::copy_image_subdata(GLint srcLevel, glm::ivec3 srcOffset, texture& destination, GLint dstLevel, glm::ivec3 dstOffset, glm::uvec3 size) const {
         glCopyImageSubData(thisref, (GLenum)thisref.target(), srcLevel, srcOffset.x, srcOffset.y, srcOffset.z, destination, (GLenum)destination.target(), dstLevel, dstOffset.x, dstOffset.y, dstOffset.z, size.x, size.y, size.z);
+    }
+
+    std::vector<texture> texture::create(_texture_context &gltarget, size_t n) {
+        GLuint * objects = new GLuint[n];
+        glCreateTextures(gltarget, n, objects);
+        std::vector<texture> textures;
+        for (intptr_t pt = 0; pt < n; pt++) {
+            textures.push_back(texture(gltarget, objects + pt));
+        }
+        return std::move(textures);
     }
 
 
