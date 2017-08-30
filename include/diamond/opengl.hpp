@@ -18,20 +18,31 @@ namespace NS_NAME {
     protected:
         std::shared_ptr<GLuint> globj;
         void set_object(std::shared_ptr<GLuint>& obj) { globj = obj; } // share pointer
+        void set_object(std::shared_ptr<GLuint>&& obj) { globj = obj; } // share pointer
         void set_object(GLuint obj) { globj = std::make_shared<GLuint>(obj); }
         void set_object(GLuint * obj) { globj = std::shared_ptr<GLuint>(obj); }
         void set_object(GLint obj) { globj = std::make_shared<GLuint>(obj); }
         void set_object(GLint * obj) { globj = std::shared_ptr<GLuint>((GLuint *)obj); }
         operator GLuint*() { return globj.get(); }
+
+        std::shared_ptr<GLuint> _get_shared() const {
+            return std::move(globj);
+        }
+        std::shared_ptr<GLuint>& _get_shared() {
+            return globj;
+        }
     public:
         base() { }
         ~base() { }
-        operator const GLuint&() const { return *globj; }
+        operator const GLuint&() const { return (*globj); }
         void make_ptr() {
             globj = std::shared_ptr<GLuint>(new GLuint[1]{0xFFFFFFFF});
         }
         bool ready_free() {
             return globj.use_count() <= 1; // count references before remove
+        }
+        bool is_active() {
+            return !!globj;
         }
     };
 

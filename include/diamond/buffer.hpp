@@ -15,13 +15,31 @@ namespace NS_NAME {
     protected:
         using buffer = void_buffer<T>;
         using buffer_ptr = void_buffer<T> *;
+        
+        template<class T>
+        friend class void_buffer;
 
     public:
 
-        void_buffer<T>(void_buffer<T>& another) { this->set_object(another.globj); } // when assign, share pointer
+        void_buffer<T>(buffer& another) { this->set_object(another._get_shared()); } // when assign, share pointer
+        void_buffer<T>(const buffer& another) { this->set_object(another._get_shared()); } // when assign, share pointer
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(allocationPointer); } // can be used with allocators
         void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() { if (base::ready_free()) glDeleteBuffers(1, thisref); }
+        ~void_buffer<T>() {
+            if (base::is_active() && base::ready_free()) {
+                glDeleteBuffers(1, thisref);
+            }
+        }
+
+        static std::vector<buffer> create(GLint n) {
+            GLuint * objects = new GLuint[n];
+            glCreateBuffers(n, objects);
+            std::vector<buffer> buffers;
+            for (intptr_t pt = 0; pt < n; pt++) {
+                buffers.push_back(buffer(objects + pt));
+            }
+            return buffers;
+        }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);
