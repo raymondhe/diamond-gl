@@ -16,8 +16,7 @@ namespace NS_NAME {
         }
 
         ~shader() {
-            glDeleteShader(thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteShader(thisref);
         }
 
         template<class T>
@@ -156,8 +155,7 @@ namespace NS_NAME {
         }
 
         ~program() { 
-            glDeleteProgram(thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteProgram(thisref);
         }
 
         uniform get_uniform(GLuint location) const {
@@ -216,11 +214,11 @@ namespace NS_NAME {
     class program_pipeline: public base {
     public:
          program_pipeline() {
+             base::make_ptr();
              glCreateProgramPipelines(1, thisref);
          }
         ~program_pipeline() {
-            glDeleteProgramPipelines(1, thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteProgramPipelines(1, thisref);
         }
 
         void use_stages(program_stage_bits stages, program& prog){

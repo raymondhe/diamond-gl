@@ -19,8 +19,8 @@ namespace NS_NAME {
     public:
 
         void_buffer<T>(GLuint * allocationPointer) { this->set_object(allocationPointer); } // can be used with allocators
-        void_buffer<T>() { glCreateBuffers(1, thisref); }
-        ~void_buffer<T>() { glDeleteBuffers(1, thisref); this->set_object(-1); }
+        void_buffer<T>() { base::make_ptr(); glCreateBuffers(1, thisref); }
+        ~void_buffer<T>() { if (base::ready_free()) glDeleteBuffers(1, thisref); }
 
         void get_subdata(GLintptr offset, GLsizei size, void *data) const {
             glGetNamedBufferSubData(thisref, offset, size, data);

@@ -19,7 +19,6 @@ namespace NS_NAME {
 
     public:
         ~texture_level() { 
-            this->set_object(-1);
         };
         texture_level(texture& tex, GLint level = 0);
 
@@ -62,8 +61,7 @@ namespace NS_NAME {
         texture(_texture_context &gltarget);
 
         ~texture(){
-            glDeleteTextures(1, thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteTextures(1, thisref);
         }
 
         texture_level get_level(GLint level = 0) {
@@ -240,12 +238,12 @@ namespace NS_NAME {
     class sampler: public base {
     public:
         sampler(){
+            base::make_ptr();
             glCreateSamplers(1, thisref);
         }
 
         ~sampler(){
-            glDeleteSamplers(1, thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteSamplers(1, thisref);
         }
 
 
@@ -312,7 +310,6 @@ namespace NS_NAME {
         }
 
         ~texture_binding(){
-            this->set_object(-1);
         }
 
         void bind_sampler(sampler& sam) {
@@ -360,6 +357,7 @@ namespace NS_NAME {
 
     texture::texture(_texture_context &gltarget) {
         this->gltarget = &gltarget;
+        base::make_ptr();
         glCreateTextures(gltarget, 1, (GLuint *)thisref);
     };
 

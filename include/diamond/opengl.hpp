@@ -7,7 +7,7 @@
 #endif
 
 #include "glm/glm.hpp"
-#include <tuple>
+#include <memory>
 
 #define thisref (*this)
 #define NS_NAME dgl
@@ -16,16 +16,23 @@ namespace NS_NAME {
 
     class base {
     protected:
-        GLuint globj = 0;
-        void set_object(GLuint obj) { globj = obj; }
-        void set_object(GLuint * obj) { globj = *obj; }
-        void set_object(GLint obj) { globj = obj; }
-        void set_object(GLint * obj) { globj = *obj; }
-        operator GLuint*() { return &globj; }
+        std::shared_ptr<GLuint> globj;
+        void set_object(std::shared_ptr<GLuint>& obj) { globj = obj; } // share pointer
+        void set_object(GLuint obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLuint * obj) { globj = std::shared_ptr<GLuint>(obj); }
+        void set_object(GLint obj) { globj = std::make_shared<GLuint>(obj); }
+        void set_object(GLint * obj) { globj = std::shared_ptr<GLuint>((GLuint *)obj); }
+        operator GLuint*() { return globj.get(); }
     public:
         base() { }
         ~base() { }
-        operator const GLuint&() const { return globj; }
+        operator const GLuint&() const { return *globj; }
+        void make_ptr() {
+            globj = std::shared_ptr<GLuint>(new GLuint[1]{0xFFFFFFFF});
+        }
+        bool ready_free() {
+            return globj.use_count() <= 1; // count references before remove
+        }
     };
 
 

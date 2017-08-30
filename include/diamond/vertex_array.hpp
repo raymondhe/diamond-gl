@@ -21,7 +21,6 @@ namespace NS_NAME {
             this->set_object(binding);
         }
         ~vertex_array_binding(){
-            this->set_object(-1);
         }
 
         void vertex_buffer(buffer& buf, GLintptr offset = 0);
@@ -52,11 +51,11 @@ namespace NS_NAME {
     class vertex_array: public base {
     public:
         vertex_array() {
+            base::make_ptr();
             glCreateVertexArrays(1, thisref);
         }
         ~vertex_array() {
-            glDeleteVertexArrays(1, thisref);
-            this->set_object(-1);
+            if (base::ready_free()) glDeleteVertexArrays(1, thisref);
         }
 
         template<class... T>
@@ -83,7 +82,6 @@ namespace NS_NAME {
     // attribute removing when not using anymore
     vertex_array_attribute::~vertex_array_attribute() {
         //glDisableVertexArrayAttrib(*glvao, thisref);
-        //this->set_object(-1);
     }
 
     void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
