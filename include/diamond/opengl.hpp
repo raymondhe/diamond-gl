@@ -59,10 +59,6 @@ namespace NS_NAME {
             globj = std::make_shared<GLuint>(*obj); // copy allocated pointer, because can be deleted by another GL object
         }
 
-        // constructor default
-        template<class ...ARG>
-        explicit gl_object(ARG&&... args) {}
-
 
         // destructor
         ~gl_object(){
