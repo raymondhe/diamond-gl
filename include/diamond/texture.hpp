@@ -67,7 +67,7 @@ namespace NS_NAME {
         }
 
         texture_level get_level(GLint level = 0) {
-            return std::move(texture_level(thisref, std::move(level)));
+            return texture_level(thisref, level);
         }
 
         _texture_context& target() const {
@@ -187,7 +187,7 @@ namespace NS_NAME {
         std::vector<T> get_image_subdata(GLint level, glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
             std::vector<T> buffer(buffersize);
             this->get_image_subdata(level, offset, size, format, type, buffer.size() * sizeof(T), buffer.data());
-            return std::move(buffer);
+            return buffer;
         }
     };
 
@@ -222,7 +222,7 @@ namespace NS_NAME {
     // get subimage as vector
     template<class T>
     std::vector<T> texture_level::get_image_subdata(glm::ivec3 offset, glm::uvec3 size, GLenum format, GLenum type, GLenum buffersize) const {
-        return std::move(gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffersize));
+        return gltex->get_image_subdata<T>(thisref, offset, size, format, type, buffersize);
     }
 
     template<class T>
@@ -308,7 +308,7 @@ namespace NS_NAME {
     public:
         friend _texture_context;
         texture_binding(GLuint binding = 0) {
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
 
         ~texture_binding(){
@@ -330,7 +330,7 @@ namespace NS_NAME {
     class image: public base {
     public:
         image(GLuint binding = 0) {
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
 
         // bind image texture
@@ -344,12 +344,12 @@ namespace NS_NAME {
     class _texture_context: public base {
     public:
         _texture_context(GLuint binding = 0) {
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
 
         // create single texture
         texture create() {
-            return std::move(texture(*this));
+            return texture(thisref);
         }
 
         // context named binding

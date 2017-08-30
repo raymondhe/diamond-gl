@@ -89,7 +89,7 @@ namespace NS_NAME {
     public:
         buffer_binding(_buffer_context& btarget, GLuint binding = 0) {
             gltarget = &btarget; 
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
         ~buffer_binding();
 
@@ -102,11 +102,11 @@ namespace NS_NAME {
     class _buffer_context: public base {
     public:
         _buffer_context(GLuint binding) {
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
 
         buffer_binding create_binding(GLuint binding = 0){
-            return std::move(buffer_binding(thisref, std::move(binding)));
+            return buffer_binding(thisref, binding);
         }
 
         // context named binding

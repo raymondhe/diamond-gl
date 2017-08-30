@@ -161,21 +161,21 @@ namespace NS_NAME {
         }
 
         uniform get_uniform(GLuint location) const {
-            return std::move(uniform(thisref, location));
+            return uniform(thisref, location);
         }
 
         uniform get_uniform(std::string name) const {
-            return std::move(get_uniform(glGetUniformLocation(thisref, name.c_str())));
+            return get_uniform(glGetUniformLocation(thisref, name.c_str()));
         }
 
         template<class T>
         uniform_typed<T> get_uniform(GLuint location) const {
-            return std::move(uniform_typed<T>((GLuint)thisref, location));
+            return uniform_typed<T>((GLuint)thisref, location);
         }
 
         template<class T>
         uniform_typed<T> get_uniform(std::string name) const {
-            return std::move(this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str())));
+            return this->get_uniform<T>(glGetUniformLocation(thisref, name.c_str()));
         }
 
 
@@ -191,7 +191,7 @@ namespace NS_NAME {
 
         template<class T>
         T get_val(GLenum pname, T * params = nullptr) const {
-            return *thisref.get<T>(pname, params);
+            return *(thisref.get<T>(pname, params));
         }
 
 

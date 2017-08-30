@@ -18,7 +18,7 @@ namespace NS_NAME {
     public:
         vertex_array_binding(vertex_array& vao, GLuint binding = 0) {
             glvao = &vao;
-            this->set_object(std::move(binding));
+            this->set_object(binding);
         }
         ~vertex_array_binding(){
             this->set_object(-1);
@@ -61,11 +61,11 @@ namespace NS_NAME {
 
         template<class... T>
         vertex_array_binding<T...> create_binding(GLuint binding = 0) {
-            return std::move(vertex_array_binding<T...>(thisref, std::move(binding)));
+            return vertex_array_binding<T...>(thisref, binding);
         }
 
         vertex_array_attribute create_attribute(GLuint attribute = 0){
-            return std::move(vertex_array_attribute(thisref, std::move(attribute)));
+            return vertex_array_attribute(thisref, attribute);
         }
 
         void element_buffer(buffer& buf){
@@ -76,7 +76,7 @@ namespace NS_NAME {
 
     vertex_array_attribute::vertex_array_attribute(vertex_array& vao, GLuint binding) {
         glvao = &vao;
-        this->set_object(std::move(binding));
+        this->set_object(binding);
         glEnableVertexArrayAttrib(*glvao, thisref);
     }
 
