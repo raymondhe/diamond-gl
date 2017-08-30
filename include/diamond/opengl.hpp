@@ -35,7 +35,7 @@ namespace NS_NAME {
         ~base() { }
         operator const GLuint&() const { return (*globj); }
         void make_ptr() {
-            globj = std::shared_ptr<GLuint>(new GLuint[1]{0xFFFFFFFF});
+            globj = std::make_shared<GLuint>(-1);
         }
         bool ready_free() {
             return globj && globj.use_count() <= 1; // count references before remove
