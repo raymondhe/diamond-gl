@@ -81,7 +81,9 @@ namespace NS_NAME {
 
     // attribute removing when not using anymore
     vertex_array_attribute::~vertex_array_attribute() {
-        //glDisableVertexArrayAttrib(*glvao, thisref);
+        if (base::ready_free()) {
+            glDisableVertexArrayAttrib(*glvao, thisref);
+        }
     }
 
     void vertex_array_attribute::attrib_format(GLint size, GLenum type, GLboolean normalized, GLuint relativeoffset) {
