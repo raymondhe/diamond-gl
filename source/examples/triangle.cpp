@@ -110,9 +110,7 @@ int main() {
     texture.parameter_val<int>(GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     texture.parameter_val<int>(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     texture.parameter_val<int>(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    dgl::texture_level texlv = texture.get_level(0); // get this mip level
-    
+    texture.level(0).subimage(glm::ivec2(0), glm::uvec2(1, 1), GL_RGBA, GL_FLOAT, new float[4]{ 0.0f, 0.0f, 0.0f, 1.0f });
 
     // create GL texture binding
     auto textureBinding = dgl::texture_binding(0);

@@ -78,7 +78,7 @@ namespace NS_NAME {
 
         static std::vector<texture> create(_texture_context &gltarget, size_t n = 1);
 
-        texture_level get_level(GLint level = 0) {
+        texture_level level(GLint level = 0) {
             return texture_level(thisref, level);
         }
 
